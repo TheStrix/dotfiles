@@ -5,6 +5,8 @@ then
 echo "Usage: build-cm <device> <sync,dirtybuild,clean>"
 else
 cd /home/parth/cm
+export KBUILD_BUILD_USER=ParthB
+export KBUILD_BUILD_HOST=Triton
 export USE_CCACHE=1
 ./prebuilts/misc/linux-x86/ccache/ccache -M 50
 if [[ "$2" =~ "sync" ]];
