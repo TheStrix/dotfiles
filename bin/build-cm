@@ -2,7 +2,7 @@
 
 if [ -z "$1" ];
 then
-echo "Usage: build-cm <device> <sync,dirtybuild,clean>"
+echo "Usage: build-cm <device> <sync,dirtybuild,clean,bootimage>"
 else
 cd /home/parth/cm
 export KBUILD_BUILD_USER=ParthB
@@ -29,5 +29,10 @@ fi
 if [ -f "${OUT}/obj/ETC/system_build_prop_intermediates/build.prop" ]; then
 rm -vf "${OUT}/obj/ETC/system_build_prop_intermediates/build.prop"
 fi
-time make -j24 bacon
+if [[ "$2" =~ "bootimage" ]];
+then
+make -j32 bootimage
+else
+time make -j32 bacon
+fi
 fi
