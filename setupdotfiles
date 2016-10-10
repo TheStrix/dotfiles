@@ -1,0 +1,8 @@
+#!/bin/bash
+
+cp bashrcadditions.sh ~/
+sudo sed -i "\$asource ~/bashrcadditions.sh" /etc/bash.bashrc
+source /etc/bash.bashrc
+
+cp -R bin/* $HOME/bin/.
+cp -R .zsh* $HOME/.

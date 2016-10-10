@@ -1,0 +1,3 @@
+#!/bin/bash
+
+time repo sync --force-broken --force-sync --no-clone-bundle --quiet --current-branch $@

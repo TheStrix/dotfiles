@@ -1,0 +1,31 @@
+#!/bin/bash
+
+if [ -z "$1" ];
+then
+echo "Usage: build-cm <device> <sync,dirtybuild,clean>"
+else
+cd /home/parth/cm
+export USE_CCACHE=1
+./prebuilts/misc/linux-x86/ccache/ccache -M 50
+if [[ "$2" =~ "sync" ]];
+then
+syncc;
+fi
+source build/envsetup.sh
+breakfast $1
+if [[ "$2" =~ "dirtybuild" ]];
+then
+make dirty && make installclean
+fi
+if [[ "$2" =~ "clean" ]];
+then
+make clobber
+fi
+if [ -f "${OUT}/system/build.prop" ]; then
+rm -vf "${OUT}/system/build.prop"
+fi
+if [ -f "${OUT}/obj/ETC/system_build_prop_intermediates/build.prop" ]; then
+rm -vf "${OUT}/obj/ETC/system_build_prop_intermediates/build.prop"
+fi
+time make -j24 bacon
+fi

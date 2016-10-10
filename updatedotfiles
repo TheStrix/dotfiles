@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cp -R bin/* $HOME/bin/.
+cp -R .zsh* $HOME/.
