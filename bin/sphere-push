@@ -31,11 +31,10 @@ done
 shift $((OPTIND-1))
 
 if [ "$#" -ne 1 ]; then
-    usage
+    branch=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
 fi
 
 repo_name=$(git remote -v | grep sphere | head -n1 | awk '{print $2}' | sed 's/.*\///' | sed 's/\.git//')
 username=$(git config user.name)
-branch=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
 
-git push ${push_args} git@git.sphere.ly:${username}/${repo_name} HEAD:${branch}
+git push ${push_args} git@git.sphere.ly:${username}/${repo_name} HEAD:$1

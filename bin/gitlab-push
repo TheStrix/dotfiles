@@ -36,6 +36,5 @@ fi
 
 repo_name=$(git remote -v | grep gitlab | head -n1 | awk '{print $2}' | sed 's/.*\///' | sed 's/\.git//')
 username=$(git config user.name)
-branch=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
 
-git push ${push_args} git@gitlab.com:${username}/${repo_name} HEAD:${branch}
+git push ${push_args} git@gitlab.com:${username}/${repo_name} HEAD:$1
