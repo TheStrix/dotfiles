@@ -1,8 +1,11 @@
 #!/bin/bash
 
 cp bashrcadditions.sh ~/
-sudo sed -i "\$asource ~/bashrcadditions.sh" /etc/bash.bashrc
-source /etc/bash.bashrc
+for f in ~/.bashrc; do
+    [ -e "$f" ] && sed -i "\$asource ~/bashrcadditions.sh" ~/.bashrc || sudo sed -i "\$asource ~/bashrcadditions.sh" /etc/bash.bashrc
+    break
+done
 
 cp -R bin/* $HOME/bin/.
 cp -R .zsh* $HOME/.
+echo "Done, source the bashrc"

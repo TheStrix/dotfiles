@@ -1,4 +1,4 @@
 #!/bin/bash
 
 cp bashrcadditions.sh ~/
-source /etc/bash.bashrc
+echo "Done, source the bashrc"
