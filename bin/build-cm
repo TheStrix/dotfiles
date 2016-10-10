@@ -17,7 +17,7 @@ source build/envsetup.sh
 breakfast $1
 if [[ "$2" =~ "dirtybuild" ]];
 then
-make dirty && make installclean
+make installclean
 fi
 if [[ "$2" =~ "clean" ]];
 then
