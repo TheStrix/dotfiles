@@ -1,0 +1,41 @@
+#!/bin/bash
+
+usage() {
+    echo "Usage:"
+    echo "  gitlab-push [options] branch"
+    echo
+    echo "  Options:"
+    echo "    -f Force push."
+    echo
+    echo "  Example:"
+    echo "    gitab-push -f cm-13.0"
+    echo
+    exit 1
+}
+
+while getopts ":dl:fmr:t:" opt; do
+    case $opt in
+        f) push_args="-f" ;;
+        :)
+          echo "Option -$OPTARG requires an argument"
+          echo
+          usage
+          ;;
+        \?)
+          echo "Invalid option: -$OPTARG"
+          echo
+          usage
+          ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ "$#" -ne 1 ]; then
+    usage
+fi
+
+repo_name=$(git remote -v | grep gitlab | head -n1 | awk '{print $2}' | sed 's/.*\///' | sed 's/\.git//')
+username=$(git config user.name)
+branch=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
+
+git push ${push_args} git@gitlab.com:${username}/${repo_name} HEAD:${branch}
