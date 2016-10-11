@@ -2,20 +2,18 @@
 
 if [ -z "$1" ];
 then
-echo "Usage: build-cm <device> <sync,dirtybuild,clean,bootimage>"
+echo "Usage: build-cm <device> <sync,dirty,clean,bootimage>"
 else
 cd /home/parth/cm
 export KBUILD_BUILD_USER=ParthB
 export KBUILD_BUILD_HOST=Triton
-export USE_CCACHE=1
-./prebuilts/misc/linux-x86/ccache/ccache -M 50
 if [[ "$2" =~ "sync" ]];
 then
 syncc;
 fi
 source build/envsetup.sh
 breakfast $1
-if [[ "$2" =~ "dirtybuild" ]];
+if [[ "$2" =~ "dirty" ]];
 then
 make installclean
 fi
