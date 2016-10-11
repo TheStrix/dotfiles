@@ -57,9 +57,9 @@ alias kernelarm64='export ARCH=arm64 && export CROSS_COMPILE=~/cm/prebuilts/gcc/
 alias kenzologcat='adb shell logcat > ~/Desktop/rn3log/log.txt'
 alias kenzoradiologcat='adb shell logcat -b radio > ~/Desktop/rn3log/radio.txt'
 alias kenzodmesg='adb shell dmesg > ~/Desktop/rn3log/dm.txt'
-alias kenzodenial="adb shell dmesg | grep 'avc: ' > ~/Desktop/rn3log/denial.txt"
+alias kenzodenial="adb shell dmesg | grep -a 'avc: ' > ~/Desktop/rn3log/denial.txt"
 
 alias hydrogenlogcat='adb shell logcat > ~/Desktop/maxlog/log.txt'
 alias hydrogenradiologcat='adb shell logcat -b radio > ~/Desktop/maxlog/radio.txt'
 alias hydrogendmesg='adb shell dmesg > ~/Desktop/maxlog/dm.txt'
-alias hydrogendenial="adb shell dmesg | grep 'avc: ' > ~/Desktop/maxlog/denial.txt"
+alias hydrogendenial="adb shell dmesg | grep -a 'avc: ' > ~/Desktop/maxlog/denial.txt"
