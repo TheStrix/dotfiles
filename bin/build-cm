@@ -35,4 +35,5 @@ make -j32 bootimage
 else
 time make -j32 bacon
 fi
+jack-kill
 fi

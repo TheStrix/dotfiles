@@ -1,0 +1,3 @@
+#!/bin/bash
+
+. $HOME/cm/prebuilts/sdk/tools/jack-admin kill-server
