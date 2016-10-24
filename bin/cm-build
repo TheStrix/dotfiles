@@ -2,7 +2,7 @@
 
 if [ -z "$1" ];
 then
-echo "Usage: build-cm <device> <sync,dirty,clean,bootimage>"
+echo "Usage: build-cm <device> <sync,dirty,clean,bootimage,upload>"
 else
 cd /home/parth/cm
 export KBUILD_BUILD_USER=ParthB
@@ -32,6 +32,10 @@ then
 make -j32 bootimage
 else
 time make -j32 bacon
+fi
+if [[ "$2" =~ "upload" ]];
+then
+uploadkenzoCMtoDrive ~/cm/out/target/product/kenzo/cm-14.0-*.zip
 fi
 jack-kill
 fi
