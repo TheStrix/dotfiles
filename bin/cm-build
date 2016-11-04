@@ -35,7 +35,14 @@ time make -j32 bacon
 fi
 if [[ "$2" =~ "upload" ]];
 then
-uploadkenzoCMtoDrive ~/cm/out/target/product/kenzo/cm-14.0-*.zip
+if [[ "$2" =~ "kenzo" ]];
+then
+gdrive upload --parent 0B9JxQ_RHblHkQXBlM1BEcHNjOUU ~/cm/out/target/product/kenzo/cm-14.1-*.zip
+fi
+if [[ "$2" =~ "hydrogen" ]];
+then
+gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ~/cm/out/target/product/hydrogen/cm-14.1-*.zip
+fi
 fi
 jack-kill
 fi
