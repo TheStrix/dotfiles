@@ -35,13 +35,13 @@ time make -j32 bacon
 fi
 if [[ "$2" =~ "upload" ]];
 then
-if [[ "$2" =~ "kenzo" ]];
+if [[ "$1" =~ "kenzo" || "$1" =~ "cm_kenzo-eng" ]];
 then
-gdrive upload --parent 0B9JxQ_RHblHkQXBlM1BEcHNjOUU ~/cm/out/target/product/kenzo/cm-14.1-*.zip
+gdrive upload --parent 0B9JxQ_RHblHkQXBlM1BEcHNjOUU ~/cm/out/target/product/kenzo/cm-*.zip
 fi
-if [[ "$2" =~ "hydrogen" ]];
+if [[ "$1" =~ "hydrogen" || "$1" =~ "cm_hydrogen-eng" ]];
 then
-gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ~/cm/out/target/product/hydrogen/cm-14.1-*.zip
+gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ~/cm/out/target/product/hydrogen/cm-*.zip
 fi
 fi
 jack-kill

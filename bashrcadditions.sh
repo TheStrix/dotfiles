@@ -52,10 +52,10 @@ alias node1='ssh parthb@104.236.248.224'
 alias node3='ssh parth@198.199.71.201'
 alias yufastboot='fastboot -i 0x2A96'
 alias makekernel='make ARCH=arm64 CROSS_COMPILE="/home/parth/cm/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
-alias grepandro='grep "\.so\|\.xml\|\.conf"'
+alias grepandro='grep -i "\.so\|\.xml\|\.conf\|\.txt\|\.cfg\|\.dat"'
+
 # Gdrive
 alias uploadkenzoCMtoDrive='gdrive upload --parent 0B9JxQ_RHblHkQXBlM1BEcHNjOUU'
-alias uploadhydrogenCMtoDrive='gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE'
 
 # LOGs
 alias kenzologcat='adb shell logcat > ~/Desktop/rn3log/log.txt'

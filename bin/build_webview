@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-chromium_version="52.0.2743.90"
+chromium_version="52.0.2743.98"
 clean=0
 supported_arch=(arm arm64 x86 x64)
 
@@ -116,8 +116,9 @@ cp chrome/android/java/res_chromium/mipmap-xxhdpi/app_icon.png android_webview/a
 cp chrome/android/java/res_chromium/mipmap-xxxhdpi/app_icon.png android_webview/apk/java/res/drawable-xxxhdpi/icon_webview.png
 
 # Build args
-args+='target_os="android" is_official_build=true is_debug=false is_component_build=false symbol_level=0 enable_nacl=false remove_webcore_debug_symbols=true'
-args+=' android_default_version_name="'$chromium_version'"'
+args+='target_os="android" is_debug=false is_official_build=true is_chrome_branded=false use_official_google_api_keys=false'
+args+=' exclude_unwind_tables=true enable_resource_whitelist_generation=true ffmpeg_branding="Chrome" proprietary_codecs=true'
+args+=' enable_remoting=true android_default_version_name="'$chromium_version'"'
 if [ "$USE_CCACHE" -eq 1 ]; then
     export CCACHE_CPP2=yes
     export CCACHE_SLOPPINESS=time_macros
