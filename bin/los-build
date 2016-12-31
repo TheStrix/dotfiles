@@ -2,9 +2,11 @@
 
 if [ -z "$1" ];
 then
-echo "Usage: build-cm <device> <sync,dirty,clean,bootimage,upload>"
+echo "Usage: build-los <device> <sync,dirty,clean,bootimage,upload>"
 else
-cd /home/parth/cm
+if [ -f "~/los" ]; then
+cd ~/los
+fi
 export KBUILD_BUILD_USER=ParthB
 export KBUILD_BUILD_HOST=Triton
 if [[ "$2" =~ "sync" ]];
@@ -37,11 +39,11 @@ if [[ "$2" =~ "upload" ]];
 then
 if [[ "$1" =~ "kenzo" || "$1" =~ "cm_kenzo-eng" ]];
 then
-gdrive upload --parent 0B9JxQ_RHblHkQXBlM1BEcHNjOUU ~/cm/out/target/product/kenzo/cm-*.zip
+gdrive upload --parent 0B9JxQ_RHblHkQXBlM1BEcHNjOUU ~/los/out/target/product/kenzo/lineage-*.zip
 fi
 if [[ "$1" =~ "hydrogen" || "$1" =~ "cm_hydrogen-eng" ]];
 then
-gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ~/cm/out/target/product/hydrogen/cm-*.zip
+gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ~/los/out/target/product/hydrogen/lineage-*.zip
 fi
 fi
 jack-kill
