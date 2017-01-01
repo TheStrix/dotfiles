@@ -1,11 +1,13 @@
 #!/bin/bash
 
+LINEAGEDIR=$HOME/lineage/
+
 if [ -z "$1" ];
 then
-echo "Usage: build-los <device> <sync,dirty,clean,bootimage,upload>"
+echo "Usage: lineage-build <device> <sync,dirty,clean,bootimage,upload>"
 else
-if [ -f "~/los" ]; then
-cd ~/los
+if [ -d "$LINEAGEDIR" ]; then
+cd $LINEAGEDIR
 fi
 export KBUILD_BUILD_USER=ParthB
 export KBUILD_BUILD_HOST=Triton
@@ -37,13 +39,13 @@ time make -j32 bacon
 fi
 if [[ "$2" =~ "upload" ]];
 then
-if [[ "$1" =~ "kenzo" || "$1" =~ "cm_kenzo-eng" ]];
+if [[ "$1" =~ "kenzo" || "$1" =~ "cm_kenzo-eng" || "$1" =~ "lineage_kenzo-eng" ]];
 then
-gdrive upload --parent 0B9JxQ_RHblHkQXBlM1BEcHNjOUU ~/los/out/target/product/kenzo/lineage-*.zip
+gdrive upload --parent 0B9JxQ_RHblHkQXBlM1BEcHNjOUU ${OUT}/lineage-*.zip
 fi
-if [[ "$1" =~ "hydrogen" || "$1" =~ "cm_hydrogen-eng" ]];
+if [[ "$1" =~ "hydrogen" || "$1" =~ "cm_hydrogen-eng" || "$1" =~ "lineage_hydrogen-eng" ]];
 then
-gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ~/los/out/target/product/hydrogen/lineage-*.zip
+gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ${OUT}/lineage-*.zip
 fi
 fi
 jack-kill

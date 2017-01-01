@@ -2,7 +2,7 @@
 
 usage() {
     echo "Usage:"
-    echo "  los-push [options] branch"
+    echo "  lineage-push [options] branch"
     echo
     echo "  Options:"
     echo "    -d Upload change as draft."
@@ -15,8 +15,8 @@ usage() {
     echo "    -t <topic> Append topic to change."
     echo
     echo "  Example:"
-    echo "    los-push -d -t test cm-13.0"
-    echo "    los-push -s -l \"Code-Review+2,Verified+1\" cm-14.1"
+    echo "    lineage-push -d -t test cm-13.0"
+    echo "    lineage-push -s -l \"Code-Review+2,Verified+1\" cm-14.1"
     echo
     exit 1
 }
