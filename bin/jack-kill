@@ -1,3 +1,7 @@
 #!/bin/bash
 
-. $HOME/cm/prebuilts/sdk/tools/jack-admin kill-server
+LINEAGEDIR=$HOME/lineage/
+
+if [ -d "$LINEAGEDIR" ]; then
+. $LINEAGEDIR/prebuilts/sdk/tools/jack-admin kill-server
+fi
