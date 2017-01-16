@@ -1,3 +1,3 @@
 #!/bin/bash
 
-time repo sync --force-broken --force-sync --no-clone-bundle --quiet --current-branch $@
+time repo sync -c -f --force-broken --force-sync --no-clone-bundle --no-tags $@
