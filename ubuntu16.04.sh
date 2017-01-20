@@ -57,6 +57,19 @@ else
     echo
 fi
 
-echo Done! Sync your ROM and build it
-echo If lineage, install ImageMagic
-cd ~/
+echo -n "Do you wish sync LineageOS and breakfast kenzo and hydrogen? "
+read answer
+if echo "$answer" | grep -iq "^y" ;then
+    mkdir ~/lineage
+    cd ~/lineage
+    repo init -u git://github.com/LineageOS/android.git -b cm-14.1
+    syncc -j12
+    . build/envsetup.sh
+    echo syncing kenzo and hydrogen trees
+    breakfast kenzo
+    breakfast hydrogen
+    echo syncing xiaomi vendor
+    git clone git@github.com:TheMuppets/proprietary_vendor_xiaomi.git -b cm-14.1 ~/lineage/vendor/xiaomi
+else
+    echo
+fi
