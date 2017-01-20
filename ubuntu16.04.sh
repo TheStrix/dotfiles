@@ -49,7 +49,7 @@ cd ~/dotfiles/
 ./setupdotfiles
 
 
-echo -n "Do you wish to source new bashrcadditions (y/n)?"
+echo -e "${yellow}Do you wish to source new bashrcadditions (y/n)? ${nc}"
 read answer
 if echo -e "$answer" | grep -iq "^y" ;then
     source ~/bashrcadditions.sh
@@ -71,7 +71,7 @@ if echo -e "$answer" | grep -iq "^y" ;then
     echo -e "${yellow}syncing xiaomi vendor${nc}"
     git clone git@github.com:TheMuppets/proprietary_vendor_xiaomi.git -b cm-14.1 ~/lineage/vendor/xiaomi
 
-    echo -n "Install ImageMagic? (y/n)"
+    echo -e "${yellow}Install ImageMagic? (y/n)${nc}"
     read answer
     if echo "$answer" | grep -iq "^y" ;then
         echo -e "${yellow}Installing ImageMagic from source (https://www.imagemagick.org/script/install-source.php)${nc}"
