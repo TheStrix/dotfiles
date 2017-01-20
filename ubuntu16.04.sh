@@ -30,7 +30,7 @@ Whi='\e[0;37m';     BWhi='\e[1;37m';    UWhi='\e[4;37m';    IWhi='\e[0;97m';    
 
 
 clear
-echo "${Red}Installing Dependencies!${RCol}"
+echo -e ${Red}Installing Dependencies!${RCol}"
 sudo apt update -y
 sudo apt install git-core python gnupg flex bison gperf libsdl1.2-dev libesd0-dev \
 squashfs-tools build-essential zip curl libncurses5-dev zlib1g-dev openjdk-8-jre openjdk-8-jdk pngcrush \
@@ -39,11 +39,11 @@ gcc-multilib liblz4-* pngquant ncurses-dev texinfo gcc gperf patch libtool figle
 automake g++ gawk subversion expat libexpat1-dev python-all-dev bc libcloog-isl-dev \
 libcap-dev autoconf libgmp-dev build-essential gcc-multilib g++-multilib pkg-config libmpc-dev libmpfr-dev lzma* \
 liblzma* w3m android-tools-adb maven ncftp htop -y
-echo "${Red}Dependencies have been installed${RCol}"
-echo "${Red}repo has been Downloaded!${RCol}"
+echo -e "${Red}Dependencies have been installed${RCol}"
+echo -e "${Red}repo has been Downloaded!${RCol}"
 if [ ! "$(which adb)" == "" ];
 then
-echo "${Red}Setting up USB Ports${RCol}"
+echo -e "${Red}Setting up USB Ports${RCol}"
 sudo curl --create-dirs -L -o /etc/udev/rules.d/51-android.rules -O -L https://raw.githubusercontent.com/snowdream/51-android/master/51-android.rules
 sudo chmod 644   /etc/udev/rules.d/51-android.rules
 sudo chown root /etc/udev/rules.d/51-android.rules
@@ -52,20 +52,20 @@ adb kill-server
 sudo killall adb
 fi
 
-echo "${Red}Configuring repo${RCol}"
+echo -e "${Red}Configuring repo${RCol}"
 mkdir ~/bin
 PATH=~/bin:$PATH
 curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
 chmod a+x ~/bin/repo
 
-echo "${Red}Setting up dotfiles${RCol}"
+echo -e "${Red}Setting up dotfiles${RCol}"
 cd ~/dotfiles/
 ./setupdotfiles
 
 
-echo -n "${Red}Do you wish to source new bashrcadditions (y/n)? ${RCol}"
+echo -n -e "${Red}Do you wish to source new bashrcadditions (y/n)? ${RCol}"
 read answer
-if echo "$answer" | grep -iq "^y" ;then
+if echo -e "$answer" | grep -iq "^y" ;then
     source ~/bashrcadditions.sh
 else
     echo
@@ -73,22 +73,22 @@ fi
 
 echo -n "${Red}Do you wish sync LineageOS and breakfast kenzo and hydrogen? (y/n)${RCol}"
 read answer
-if echo "$answer" | grep -iq "^y" ;then
+if echo -e "$answer" | grep -iq "^y" ;then
     mkdir ~/lineage
     cd ~/lineage
     repo init -u git://github.com/LineageOS/android.git -b cm-14.1
     syncc -j12
     . build/envsetup.sh
-    echo "${Red}syncing kenzo and hydrogen trees${RCol}"
+    echo -e "${Red}syncing kenzo and hydrogen trees${RCol}"
     breakfast kenzo
     breakfast hydrogen
-    echo "${Red}syncing xiaomi vendor${RCol}"
+    echo -e "${Red}syncing xiaomi vendor${RCol}"
     git clone git@github.com:TheMuppets/proprietary_vendor_xiaomi.git -b cm-14.1 ~/lineage/vendor/xiaomi
 
-    echo -n "${Red}Install ImageMagic? (y/n)${RCol}"
+    echo -n -e "${Red}Install ImageMagic? (y/n)${RCol}"
     read answer
     if echo "$answer" | grep -iq "^y" ;then
-        echo "${Red}Installing ImageMagic from source (https://www.imagemagick.org/script/install-source.php)${RCol}"
+        echo -e "${Red}Installing ImageMagic from source (https://www.imagemagick.org/script/install-source.php)${RCol}"
         cd ~/
         wget "https://www.imagemagick.org/download/ImageMagick.tar.gz"
         tar xvzf ImageMagick.tar.gz
@@ -97,7 +97,7 @@ if echo "$answer" | grep -iq "^y" ;then
         make -j16
         sudo make install
         sudo ldconfig /usr/local/lib
-        echo "${Red}Deleting ImageMagick*${RCol}"
+        echo -e "${Red}Deleting ImageMagick*${RCol}"
         rm -rf ImageMagick*
     fi
 else
