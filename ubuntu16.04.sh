@@ -79,11 +79,12 @@ if echo "$answer" | grep -iq "^y" ;then
         wget "https://www.imagemagick.org/download/ImageMagick.tar.gz"
         tar xvzf ImageMagick.tar.gz
         rm ImageMagick.tar.gz
-        cd ImageMagick-*
         ./configure
         make -j16
         sudo make install
         sudo ldconfig /usr/local/lib
+        echo Deleting ImageMagick*
+        rm -rf ImageMagick*
     fi
 else
     echo
