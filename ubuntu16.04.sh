@@ -78,7 +78,7 @@ if echo -e "$answer" | grep -iq "^y" ;then
         cd ~/
         wget "https://www.imagemagick.org/download/ImageMagick.tar.gz"
         tar xvzf ImageMagick.tar.gz
-        rm ImageMagick.tar.gz
+        cd ImageMagick*/
         ./configure
         make -j16
         sudo make install
