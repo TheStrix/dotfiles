@@ -8,4 +8,5 @@ done
 
 cp -R bin/* $HOME/bin/.
 cp -R .zsh* $HOME/.
-echo "Done, source the bashrc"
+echo "Done, sourcing the bashrc"
+source ~/bashrcadditions.sh
