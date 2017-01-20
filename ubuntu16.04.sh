@@ -52,7 +52,7 @@ cd ~/dotfiles/
 echo -n "Do you wish to source new bashrcadditions (y/n)? "
 read answer
 if echo "$answer" | grep -iq "^y" ;then
-    echo source ~/bashrcadditions.sh
+    source ~/bashrcadditions.sh
 else
     echo
 fi
