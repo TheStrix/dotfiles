@@ -84,7 +84,7 @@ if echo -e "$answer" | grep -iq "^y" ;then
         sudo make install
         sudo ldconfig /usr/local/lib
         echo -e "${yellow}Deleting ImageMagick*${nc}"
-        rm -rf ImageMagick*
+        cd ../ && rm -rf ImageMagick*
     fi
 else
     echo
