@@ -38,6 +38,12 @@ adb kill-server
 sudo killall adb
 fi
 
+echo Configuring repo
+mkdir ~/bin
+PATH=~/bin:$PATH
+curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+chmod a+x ~/bin/repo
+
 echo Setting up dotfiles
 cd ~/dotfiles/
 ./setupdotfiles
