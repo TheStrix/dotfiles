@@ -65,11 +65,13 @@ if echo -e "$answer" | grep -iq "^y" ;then
     repo init -u git://github.com/LineageOS/android.git -b cm-14.1
     syncc -j12
     . build/envsetup.sh
+    echo -e "${yellow}syncing xiaomi vendor${nc}"
+    git clone git@github.com:TheMuppets/proprietary_vendor_xiaomi.git -b cm-14.1 ~/lineage/vendor/xiaomi
     echo -e "${yellow}syncing kenzo and hydrogen trees${nc}"
     breakfast kenzo
     breakfast hydrogen
-    echo -e "${yellow}syncing xiaomi vendor${nc}"
-    git clone git@github.com:TheMuppets/proprietary_vendor_xiaomi.git -b cm-14.1 ~/lineage/vendor/xiaomi
+    echo "${yellow}Setting up CCACHE to ~/.ccache${nc}"
+    prebuilts/misc/linux-x86/ccache/ccache -M 50G
 
     echo -ne "${yellow}Install ImageMagic? (y/n)${nc}"
     read answer
