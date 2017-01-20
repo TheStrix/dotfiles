@@ -48,14 +48,15 @@ echo Setting up dotfiles
 cd ~/dotfiles/
 ./setupdotfiles
 
-cd
+
+echo -n "Do you wish to source new bashrcadditions (y/n)? "
+read answer
+if echo "$answer" | grep -iq "^y" ;then
+    echo source ~/bashrcadditions.sh
+else
+    echo
+fi
+
 echo Done! Sync your ROM and build it
 echo If lineage, install ImageMagic
-
-echo "Do you wish to source new bashrcadditions?"
-select yn in "Yes" "No"; do
-    case $yn in
-        Yes ) source ~/bashrcadditions.sh;;
-        No ) exit;;
-    esac
-done
+cd ~/
