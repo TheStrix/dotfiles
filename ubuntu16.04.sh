@@ -51,3 +51,11 @@ cd ~/dotfiles/
 cd
 echo Done! Sync your ROM and build it
 echo If lineage, install ImageMagic
+
+echo "Do you wish to source new bashrcadditions?"
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) source ~/bashrcadditions.sh;;
+        No ) exit;;
+    esac
+done
