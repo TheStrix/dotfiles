@@ -57,7 +57,7 @@ else
     echo
 fi
 
-echo -n "Do you wish sync LineageOS and breakfast kenzo and hydrogen? "
+echo -n "Do you wish sync LineageOS and breakfast kenzo and hydrogen? (y/n)"
 read answer
 if echo "$answer" | grep -iq "^y" ;then
     mkdir ~/lineage
@@ -70,6 +70,21 @@ if echo "$answer" | grep -iq "^y" ;then
     breakfast hydrogen
     echo syncing xiaomi vendor
     git clone git@github.com:TheMuppets/proprietary_vendor_xiaomi.git -b cm-14.1 ~/lineage/vendor/xiaomi
+
+    echo -n "Install ImageMagic? (y/n)"
+    read answer
+    if echo "$answer" | grep -iq "^y" ;then
+        echo Installing ImageMagic from source (https://www.imagemagick.org/script/install-source.php)
+        cd ~/
+        wget "https://www.imagemagick.org/download/ImageMagick.tar.gz"
+        tar xvzf ImageMagick.tar.gz
+        rm ImageMagick.tar.gz
+        cd ImageMagick-*
+        ./configure
+        make -j16
+        sudo make install
+        sudo ldconfig /usr/local/lib
+    fi
 else
     echo
 fi
