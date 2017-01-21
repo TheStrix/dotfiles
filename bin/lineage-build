@@ -79,11 +79,13 @@ create_hydrogenccache() {
 }
 
 if [[ ! -e $KENZOCCACHE ]]; then
+  echo "${yellow}Kenzo CCACHE dir $KENZOCCACHE not found... Creating and setting it up!${nc}"
   mkdir $KENZOCCACHE
   create_kenzoccache
 fi
 
 if [[ ! -e $HYDROGENCCACHE ]]; then
+  echo "${yellow}hydrogen CCACHE dir $HYDROGENCCACHE not found... Creating and setting it up!${nc}"
   mkdir $HYDROGENCCACHE
   create_hydrogenccache
 fi
