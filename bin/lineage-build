@@ -11,6 +11,7 @@ cd $LINEAGEDIR
 fi
 export KBUILD_BUILD_USER=ParthB
 export KBUILD_BUILD_HOST=Triton
+export WITH_SU=true
 if [[ "$2" =~ "sync" ]];
 then
 syncc;
