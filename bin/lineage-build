@@ -4,50 +4,137 @@ LINEAGEDIR=$HOME/lineage/
 
 if [ -z "$1" ];
 then
-echo "Usage: lineage-build <device> <sync,dirty,clean,bootimage,upload>"
+  echo "${yellow}Usage: lineage-build <device> <sync,dirty,clean,bootimage,upload,release,cleancreateccache>${nc}"
 else
 if [ -d "$LINEAGEDIR" ]; then
-cd $LINEAGEDIR
+  cd $LINEAGEDIR
 fi
+
 export KBUILD_BUILD_USER=ParthB
 export KBUILD_BUILD_HOST=Triton
 export WITH_SU=true
+
 if [[ "$2" =~ "sync" ]];
 then
-syncc;
+  syncc;
 fi
+
 source build/envsetup.sh
 breakfast $1
+
 if [[ "$2" =~ "dirty" ]];
 then
-make installclean
+  make installclean
 fi
+
 if [[ "$2" =~ "clean" ]];
 then
-make clobber
+  make clobber
 fi
 if [ -f "${OUT}/system/build.prop" ]; then
-rm -vf "${OUT}/system/build.prop"
+  rm -vf "${OUT}/system/build.prop"
 fi
 if [ -f "${OUT}/obj/ETC/system_build_prop_intermediates/build.prop" ]; then
-rm -vf "${OUT}/obj/ETC/system_build_prop_intermediates/build.prop"
+  rm -vf "${OUT}/obj/ETC/system_build_prop_intermediates/build.prop"
 fi
-if [[ "$2" =~ "bootimage" ]];
-then
-make -j32 bootimage
-else
-time make -j32 bacon
+
+# CCACHE
+KENZOCCACHE=$HOME/.kenzoccache/
+HYDROGENCCACHE=$HOME/.hydrogenccache/
+
+setup_kenzoccache() {
+  export CCACHE_DIR=$KENZOCCACHE
+  export USE_CCACHE=1
+}
+
+setup_hydrogenccache() {
+  export CCACHE_DIR=$HYDROGENCCACHE
+  export USE_CCACHE=1
+}
+
+delete_kenzoccache() {
+    prebuilts/misc/linux-x86/ccache/ccache -C
+    rm -rf $KENZOCCACHE
+}
+
+delete_hydrogenccache() {
+    prebuilts/misc/linux-x86/ccache/ccache -C
+    rm -rf $HYDROGENCCACHE
+}
+
+create_kenzoccache() {
+    echo -e "${yellow}\nINFO: Setting kenzo CCACHE with 25 GB\n${nc}"
+    cd $LINEAGEDIR
+    setup_kenzoccache
+    delete_kenzoccache
+    prebuilts/misc/linux-x86/ccache/ccache -M 25G
+}
+
+create_hydrogenccache() {
+    echo -e "${yellow}\nINFO: Setting hydrogen CCACHE with 25 GB\n${nc}"
+    cd $LINEAGEDIR
+    setup_hydrogenccache
+    delete_hydrogenccache
+    prebuilts/misc/linux-x86/ccache/ccache -M 25G
+}
+
+if [[ ! -e $KENZOCCACHE ]]; then
+  mkdir $KENZOCCACHE
+  create_kenzoccache
 fi
-if [[ "$2" =~ "upload" ]];
-then
+
+if [[ ! -e $HYDROGENCCACHE ]]; then
+  mkdir $HYDROGENCCACHE
+  create_hydrogenccache
+fi
+
 if [[ "$1" =~ "kenzo" || "$1" =~ "cm_kenzo-eng" || "$1" =~ "lineage_kenzo-eng" ]];
 then
-gdrive upload --parent 0B9JxQ_RHblHkQXBlM1BEcHNjOUU ${OUT}/lineage-*.zip
+  echo "${yellow}Setting up kenzo CCACHE dir $KENZOCCACHE${nc}"
+  setup_kenzoccache
 fi
 if [[ "$1" =~ "hydrogen" || "$1" =~ "cm_hydrogen-eng" || "$1" =~ "lineage_hydrogen-eng" ]];
 then
-gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ${OUT}/lineage-*.zip
+  echo "${yellow}Setting up hydrogen CCACHE dir $HYDROGENCCACHE${nc}"
+  setup_hydrogenccache
 fi
+
+if [[ "$2" =~ "cleancreateccache" ]];
+then
+  if [[ "$1" =~ "kenzo" || "$1" =~ "cm_kenzo-eng" || "$1" =~ "lineage_kenzo-eng" ]];
+  then
+    create_kenzoccache
+  fi
+  if [[ "$1" =~ "hydrogen" || "$1" =~ "cm_hydrogen-eng" || "$1" =~ "lineage_hydrogen-eng" ]];
+  then
+    create_hydrogenccache
+  fi
 fi
+
+
+if [[ "$2" =~ "bootimage" ]];
+then
+  make -j32 bootimage
+else
+  time make -j32 bacon
+fi
+
+if [[ "$2" =~ "upload" ]];
+then
+  if [[ "$1" =~ "kenzo" || "$1" =~ "cm_kenzo-eng" || "$1" =~ "lineage_kenzo-eng" ]];
+  then
+    gdrive upload --parent 0B9JxQ_RHblHkQXBlM1BEcHNjOUU ${OUT}/lineage-*.zip
+  fi
+  if [[ "$1" =~ "hydrogen" || "$1" =~ "cm_hydrogen-eng" || "$1" =~ "lineage_hydrogen-eng" ]];
+  then
+    gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ${OUT}/lineage-*.zip
+  fi
+fi
+
+if [[ "$2" =~ "release" ]];
+then
+  afh ${OUT}/lineage-*.zip
+fi
+
 jack-kill
 fi
