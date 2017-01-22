@@ -48,6 +48,12 @@ OPTIONS:
     -cc, --cleanccache
         Clean ccache - clean ccache for device mentioned
 
+    -u, --upload
+        Upload build - upload build to my gdrive
+
+    -r, --release
+        Upload build - upload build to my gdrive
+
     -d, --debug
         Enable debugging - captures all commands while doing the build
 
@@ -75,7 +81,7 @@ OPTIONS:
     -s, --setup_ccache
         Set CCACHE for faster incremental builds (true/false - Default: true)
 
-    -u, --update-api
+    -a, --update-api
         Update APIs
 
     -v, --build_variant
@@ -220,9 +226,9 @@ CCACHE="true"
 CURDIR=${PWD##*/}
 
 # Setup getopt.
-long_opts="clean_build,clean_ccache,debug,help,image:,jobs:,kernel_defconf:,log,module:,"
+long_opts="clean_build,clean_ccache,upload,release,debug,help,image:,jobs:,kernel_defconf:,log,module:,"
 long_opts+="project:,setup_ccache:,update-api,build_variant:"
-getopt_cmd=$(getopt -o cccdhi:j:k:lm:p:s:uv: --long "$long_opts" \
+getopt_cmd=$(getopt -o cccurdhi:j:k:lm:p:s:av: --long "$long_opts" \
             -n $(basename $0) -- "$@") || \
             { echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
 
@@ -232,6 +238,8 @@ while true; do
     case "$1" in
         -c|--clean_build) CLEAN_BUILD="true";;
         -cc|--clean_ccache) CLEAN_CCACHE="true";;
+        -u|--upload) UPLOAD="true";;
+        -r|--release) RELEASE="true";;
         -d|--debug) DEBUG="true";;
         -h|--help) usage; exit 0;;
         -i|--image) IMAGE="$2"; shift;;
@@ -240,7 +248,7 @@ while true; do
         -l|--log) LOG="true";;
         -m|--module) MODULE="$2"; shift;;
         -p|--project) PROJECT="$2"; shift;;
-        -u|--update-api) UPDATE_API="true";;
+        -a|--update-api) UPDATE_API="true";;
         -s|--setup_ccache) CCACHE="$2"; shift;;
         -v|--build_variant) VARIANT="$2"; shift;;
         --) shift; break;;
@@ -337,3 +345,31 @@ if [ -n "$IMAGE" ]; then
 fi
 
 build_android "$CMD"
+
+echo "${yellow}KILLING JACK SERVER${nc}"
+jack-kill
+
+if [[ "$UPLOAD" = "true" ]]; then
+  if [[ "$CURDIR" = "lineage" ]]; then
+    if [[ "$TARGET" = "kenzo" ]]; then
+      echo "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
+      gdrive upload --parent 0B9JxQ_RHblHkQXBlM1BEcHNjOUU ${OUT}/lineage-*.zip
+    elif [[ "$TARGET" = "hydrogen" ]]; then
+      echo "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
+      gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ${OUT}/lineage-*.zip
+    else
+      echo "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
+      gdrive upload ${OUT}/lineage-*.zip
+    fi
+  else
+    echo "${yellow}Upload configured only for LineageOS${nc}"
+  fi
+fi
+
+if [[ "$RELEASE" = "true" ]]; then
+  if [[ "$CURDIR" = "lineage" ]]; then
+    afh ${OUT}/lineage-*.zip
+  else
+    echo "${yellow}Upload configured only for LineageOS${nc}"
+  fi
+fi
