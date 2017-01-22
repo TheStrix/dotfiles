@@ -326,21 +326,29 @@ fi
 
 if [ "$UPDATE_API" = "true" ]; then
     update_api
+    echo "${yellow}KILLING JACK SERVER${nc}"
+    jack-kill
     exit 0
 fi
 
 if [ -n "$MODULE" ]; then
     build_module "$CMD"
+    echo "${yellow}KILLING JACK SERVER${nc}"
+    jack-kill
     exit 0
 fi
 
 if [ -n "$PROJECT" ]; then
     build_project
+    echo "${yellow}KILLING JACK SERVER${nc}"
+    jack-kill
     exit 0
 fi
 
 if [ -n "$IMAGE" ]; then
     build_$IMAGE "$CMD"
+    echo "${yellow}KILLING JACK SERVER${nc}"
+    jack-kill
     exit 0
 fi
 
