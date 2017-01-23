@@ -196,14 +196,12 @@ delete_hydrogenccache() {
 
 create_kenzoccache() {
     echo -e "${yellow}\nINFO: Setting kenzo CCACHE with 25 GB\n${nc}"
-    cd $LINEAGEDIR
     setup_kenzoccache
     prebuilts/misc/linux-x86/ccache/ccache -M 25G
 }
 
 create_hydrogenccache() {
     echo -e "${yellow}\nINFO: Setting hydrogen CCACHE with 25 GB\n${nc}"
-    cd $LINEAGEDIR
     setup_hydrogenccache
     prebuilts/misc/linux-x86/ccache/ccache -M 25G
 }
