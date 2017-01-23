@@ -100,10 +100,18 @@ clean_build() {
 
 build_android() {
     echo -e "${yellow}\nINFO: Build Android tree for $TARGET\n${nc}"
-    if [ "$LOG" = "true" ]; then
-      make otapackage $@ | tee $LOG_FILE.log
+    if [[ "$CURDIR" = "aosp" ]]; then
+      if [ "$LOG" = "true" ]; then
+        make otapackage $@ | tee $LOG_FILE.log
+      else
+        make otapackage $@
+      fi
     else
-      make otapackage $@
+      if [ "$LOG" = "true" ]; then
+        make bacon $@ | tee $LOG_FILE.log
+      else
+        make bacon $@
+      fi
     fi
 }
 
