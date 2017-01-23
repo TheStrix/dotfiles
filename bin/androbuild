@@ -45,7 +45,7 @@ OPTIONS:
     -c, --clean_build
         Clean build - build from scratch by removing entire out dir
 
-    -cc, --cleanccache
+    -cc, --deleteccache
         Clean ccache - clean ccache for device mentioned
 
     -u, --upload
@@ -245,7 +245,7 @@ eval set -- "$getopt_cmd"
 while true; do
     case "$1" in
         -c|--clean_build) CLEAN_BUILD="true";;
-        -cc|--clean_ccache) CLEAN_CCACHE="true";;
+        -cc|--deleteccache) DELTE_CCACHE="true";;
         -u|--upload) UPLOAD="true";;
         -r|--release) RELEASE="true";;
         -d|--debug) DEBUG="true";;
@@ -320,13 +320,13 @@ if [ "$CLEAN_BUILD" = "true" ]; then
     clean_build
 fi
 
-if [ "$CLEAN_CCACHE" = "true" ]; then
-  if [[ "$TARGET" =~ "kenzo" ]];
+if [[ "$DELTE_CCACHE" = "true" ]]; then
+  if [[ "$TARGET" = "kenzo" ]];
   then
     echo "${yellow}Clearing kenzo CCACHE dir $KENZOCCACHE${nc}"
     delete_kenzoccache
   fi
-  if [[ "$TARGET" =~ "hydrogen" ]];
+  if [[ "$TARGET" = "hydrogen" ]];
   then
     echo "${yellow}Clearing hydrogen CCACHE dir $HYDROGENCCACHE${nc}"
     delete_hydrogenccache
