@@ -228,6 +228,11 @@ JOBS=64
 CCACHE="true"
 CURDIR=${PWD##*/}
 
+# Exports
+export KBUILD_BUILD_USER=ParthB
+export KBUILD_BUILD_HOST=Triton
+export WITH_SU=true
+
 # Setup getopt.
 long_opts="clean_build,clean_ccache,upload,release,debug,help,image:,jobs:,kernel_defconf:,log,module:,"
 long_opts+="project:,setup_ccache:,update-api,build_variant:,audit:"
