@@ -52,7 +52,7 @@ OPTIONS:
         Upload build - upload build to my gdrive
 
     -r, --release
-        Upload build - upload build to my gdrive
+        Upload build - upload build to my afh
 
     -d, --debug
         Enable debugging - captures all commands while doing the build
@@ -101,9 +101,9 @@ clean_build() {
 build_android() {
     echo -e "${yellow}\nINFO: Build Android tree for $TARGET\n${nc}"
     if [ "$LOG" = "true" ]; then
-      make $@ | tee $LOG_FILE.log
+      make otapackage $@ | tee $LOG_FILE.log
     else
-      make $@
+      make otapackage $@
     fi
 }
 
