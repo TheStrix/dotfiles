@@ -87,6 +87,9 @@ OPTIONS:
     -v, --build_variant
         Build variant (Default: userdebug)
 
+    -x, --audit
+        Use audit2allow to the denials present in speicified text (Note: $OUT/root/sepolicy required)
+
 USAGE
 }
 
@@ -227,8 +230,8 @@ CURDIR=${PWD##*/}
 
 # Setup getopt.
 long_opts="clean_build,clean_ccache,upload,release,debug,help,image:,jobs:,kernel_defconf:,log,module:,"
-long_opts+="project:,setup_ccache:,update-api,build_variant:"
-getopt_cmd=$(getopt -o cccurdhi:j:k:lm:p:s:av: --long "$long_opts" \
+long_opts+="project:,setup_ccache:,update-api,build_variant:,audit:"
+getopt_cmd=$(getopt -o cccurdhi:j:k:lm:p:s:av:x: --long "$long_opts" \
             -n $(basename $0) -- "$@") || \
             { echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
 
@@ -251,6 +254,7 @@ while true; do
         -a|--update-api) UPDATE_API="true";;
         -s|--setup_ccache) CCACHE="$2"; shift;;
         -v|--build_variant) VARIANT="$2"; shift;;
+        -x|--audit) AUDIT="$2"; shift;;
         --) shift; break;;
     esac
     shift
@@ -335,24 +339,22 @@ if [ -n "$MODULE" ]; then
     build_module "$CMD"
     echo "${yellow}KILLING JACK SERVER${nc}"
     jack-kill
-    exit 0
-fi
-
-if [ -n "$PROJECT" ]; then
+elif [ -n "$PROJECT" ]; then
     build_project
     echo "${yellow}KILLING JACK SERVER${nc}"
     jack-kill
-    exit 0
-fi
-
-if [ -n "$IMAGE" ]; then
+elif [ -n "$IMAGE" ]; then
     build_$IMAGE "$CMD"
     echo "${yellow}KILLING JACK SERVER${nc}"
     jack-kill
-    exit 0
+elif [ -n "$AUDIT" ]; then
+    echo "cat "$AUDIT" | ./audit2allow -p ${OUT}/root/sepolicy"
+    cd ./external/selinux/policycoreutils/audit2allow/
+    cat "$AUDIT" | ./audit2allow -p ${OUT}/root/sepolicy
+    cd ../../../../
+else
+    build_android "$CMD"
 fi
-
-build_android "$CMD"
 
 echo "${yellow}KILLING JACK SERVER${nc}"
 jack-kill
