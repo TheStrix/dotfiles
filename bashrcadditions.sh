@@ -41,6 +41,8 @@ echo -ne "${cyan}";upinfo;echo ""
 #------------------------------------------///
 export KBUILD_BUILD_USER=ParthB
 export USE_CCACHE=1
+# Jack is the new Java compiler used from Lineage 14. It is known to run out of memory - a simple fix is to run this command:
+export ANDROID_JACK_VM_ARGS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4G"
 
 #------------------------------------------////
 # ALIAS:
