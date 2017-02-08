@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo "Setting git configs for name TheStrix with LineageOS email"
+git config --global user.name "TheStrix"
+git config --global user.email "parthbhatia@lineageos.org"
+echo "Done!"
