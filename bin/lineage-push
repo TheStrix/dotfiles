@@ -15,7 +15,7 @@ usage() {
     echo "    -t <topic> Append topic to change."
     echo
     echo "  Example:"
-    echo "    lineage-push -d -t test cm-13.0"
+    echo "    lineage-push -d -t test cm-14.1"
     echo "    lineage-push -s -l \"Code-Review+2,Verified+1\" cm-14.1"
     echo
     exit 1
@@ -39,7 +39,7 @@ while getopts ":dl:fmr:st:" opt; do
            ;;
         m) [ -z "$ref" ] && ref="" ;;
         r) ref="refs/$OPTARG/" ;;
-        s) submit="%submit" ;;
+        s) submit="1" ;;
         t) topic="%topic=$OPTARG" ;;
         :)
           echo "Option -$OPTARG requires an argument"
@@ -61,6 +61,10 @@ fi
 
 if [ -z "$ref" ]; then
     ref="refs/for/"
+fi
+
+if [ x"$submit" == x1 ]; then
+    ref=""
 fi
 
 repo_name=$(git remote -v | grep LineageOS | head -n1 | awk '{print $2}' | sed 's/.*\///' | sed 's/\.git//')
