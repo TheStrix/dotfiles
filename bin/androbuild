@@ -45,6 +45,9 @@ OPTIONS:
     -c, --clean_build
         Clean build - build from scratch by removing entire out dir
 
+    -n, --dirty_build
+        Dirty build - Use 'make installclean'
+
     -t, --delete_ccache
         Delete ccache - clean ccache for device mentioned
 
@@ -96,6 +99,11 @@ USAGE
 clean_build() {
     echo -e "${yellow}\nINFO: Removing entire out dir. . .\n${nc}"
     make clobber
+}
+
+dirty_build() {
+    echo -e "${yellow}\nINFO: Executing 'make installclean'. . .\n${nc}"
+    make installclean
 }
 
 build_android() {
@@ -226,9 +234,9 @@ export KBUILD_BUILD_HOST=Triton
 export WITH_SU=true
 
 # Setup getopt.
-long_opts="clean_build,delete_ccache,upload,release,debug,help,image:,jobs:,kernel_defconf:,log,module:,"
+long_opts="clean_build,dirty_build,delete_ccache,upload,release,debug,help,image:,jobs:,kernel_defconf:,log,module:,"
 long_opts+="project:,setup_ccache:,update-api,build_variant:,audit:"
-getopt_cmd=$(getopt -o cturdhi:j:k:lm:p:s:av:x: --long "$long_opts" \
+getopt_cmd=$(getopt -o cnturdhi:j:k:lm:p:s:av:x: --long "$long_opts" \
             -n $(basename $0) -- "$@") || \
             { echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
 
@@ -237,6 +245,7 @@ eval set -- "$getopt_cmd"
 while true; do
     case "$1" in
         -c|--clean_build) CLEAN_BUILD="true";;
+        -n|--dirty_build) DIRTY_BUILD="true";;
         -t|--delete_ccache) DELTE_CCACHE="true";;
         -u|--upload) UPLOAD="true";;
         -r|--release) RELEASE="true";;
@@ -335,6 +344,10 @@ fi
 
 if [ "$CLEAN_BUILD" = "true" ]; then
     clean_build
+fi
+
+if [ "$DIRTY_BUILD" = "true" ]; then
+    dirty_build
 fi
 
 if [ "$UPDATE_API" = "true" ]; then
