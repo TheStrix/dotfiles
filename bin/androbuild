@@ -98,12 +98,12 @@ USAGE
 
 clean_build() {
     echo -e "${yellow}\nINFO: Removing entire out dir. . .\n${nc}"
-    make clobber
+    make clobber $@
 }
 
 dirty_build() {
     echo -e "${yellow}\nINFO: Executing 'make installclean'. . .\n${nc}"
-    make installclean
+    make installclean $@
 }
 
 build_android() {
