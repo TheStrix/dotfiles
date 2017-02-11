@@ -6,4 +6,3 @@ rm !(repo)
 
 cd ~/dotfiles
 cp -R bin/* $HOME/bin/.
-cp -R .zsh* $HOME/.
