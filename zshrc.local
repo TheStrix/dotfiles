@@ -2,4 +2,4 @@
 export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 ZSH_THEME="spaceship"
-plugins=(zsh-autosuggestions)
+plugins=(adb git zsh-autosuggestions)
