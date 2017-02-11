@@ -1,6 +1,12 @@
 #!/bin/bash
 
-echo "Setting git configs for name TheStrix with gmail email"
-git config --global user.name "TheStrix"
-git config --global user.email "parthbhatia98@gmail.com"
+USERNAME=TheStrix
+EMAIL=parthbhatia98@gmail.com
+
+echo "Setting git configs for name $USERNAME with gmail email: $EMAIL"
+git config --global user.name "$USERNAME"
+git config --global user.email "$EMAIL"
+echo "Setting lineageOS gerrit username $USERNAME and email $EMAIL"
+git config --global review.review.lineageos.org.username "$USERNAME"
+git config --global review.review.lineageos.org.email "$EMAIL"
 echo "Done!"

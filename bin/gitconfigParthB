@@ -1,6 +1,9 @@
 #!/bin/bash
 
-echo "Setting git configs for name ParthB"
-git config --global user.name "ParthB"
-git config --global user.email "bhatiaparth07@gmail.com"
+USERNAME=ParthB
+EMAIL=bhatiaparth07@gmail.com
+
+echo "Setting git configs for name $USERNAME with gmail email: $EMAIL"
+git config --global user.name "$USERNAME"
+git config --global user.email "$EMAIL"
 echo "Done!"
