@@ -366,6 +366,12 @@ elif [ -n "$PROJECT" ]; then
     echo "${yellow}KILLING JACK SERVER${nc}"
     jack-kill
 elif [ -n "$IMAGE" ]; then
+    if [[ "$IMAGE" == "recoveryimg" ]]; then
+      echo "Please enter TW_DEVICE_VERSION: "
+      read TW_DEVICE_VERSION
+      echo "Setting TW_DEVICE_VERSION=$TW_DEVICE_VERSION"
+      export TW_DEVICE_VERSION=$TW_DEVICE_VERSION
+    fi
     build_$IMAGE "$CMD"
     echo "${yellow}KILLING JACK SERVER${nc}"
     jack-kill
