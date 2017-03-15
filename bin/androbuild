@@ -391,7 +391,7 @@ if [[ "$UPLOAD" = "true" ]]; then
   if [[ "$CURDIR" = "lineage" ]]; then
     if [[ "$TARGET" = "kenzo" ]]; then
       echo "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
-      gdrive upload --parent 0B9JxQ_RHblHkQXBlM1BEcHNjOUU ${OUT}/lineage-*.zip
+      gdrive upload --parent 0B9JxQ_RHblHkZWpaejlPNUtjVEk ${OUT}/lineage-*.zip
     elif [[ "$TARGET" = "hydrogen" ]]; then
       echo "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
       gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ${OUT}/lineage-*.zip
