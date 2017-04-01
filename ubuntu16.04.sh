@@ -25,6 +25,10 @@ gcc-multilib liblz4-* pngquant ncurses-dev texinfo gcc gperf patch libtool figle
 automake g++ gawk subversion expat libexpat1-dev python-all-dev bc libcloog-isl-dev \
 libcap-dev autoconf libgmp-dev build-essential gcc-multilib g++-multilib pkg-config libmpc-dev libmpfr-dev lzma* \
 liblzma* w3m android-tools-adb maven ncftp htop -y
+echo "Installing ccache"
+sudo install utils/ccache /usr/bin/
+echo "Installing ninja 1.7.2, please make sure your ROM includes the commit to use host ninja"
+sudo install utils/ninja /usr/bin/
 echo -e "${yellow}Dependencies have been installed${nc}"
 echo -e "${yellow}repo has been Downloaded!${nc}"
 if [ ! "$(which adb)" == "" ];
