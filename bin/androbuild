@@ -201,25 +201,25 @@ setup_hydrogenccache() {
 }
 
 delete_kenzoccache() {
-    prebuilts/misc/linux-x86/ccache/ccache -C
+    ccache -C
     rm -rf $KENZOCCACHE
 }
 
 delete_hydrogenccache() {
-    prebuilts/misc/linux-x86/ccache/ccache -C
+    ccache -C
     rm -rf $HYDROGENCCACHE
 }
 
 create_kenzoccache() {
     echo -e "${yellow}\nINFO: Setting kenzo CCACHE with 25 GB\n${nc}"
     setup_kenzoccache
-    prebuilts/misc/linux-x86/ccache/ccache -M 25G
+    ccache -M 25G
 }
 
 create_hydrogenccache() {
     echo -e "${yellow}\nINFO: Setting hydrogen CCACHE with 25 GB\n${nc}"
     setup_hydrogenccache
-    prebuilts/misc/linux-x86/ccache/ccache -M 25G
+    ccache -M 25G
 }
 
 # Set defaults
