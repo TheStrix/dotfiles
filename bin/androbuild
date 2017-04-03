@@ -201,13 +201,13 @@ setup_hydrogenccache() {
 }
 
 delete_kenzoccache() {
+    export CCACHE_DIR=$KENZOCCACHE
     ccache -C
-    rm -rf $KENZOCCACHE
 }
 
 delete_hydrogenccache() {
+    export CCACHE_DIR=$HYDROGENCCACHE
     ccache -C
-    rm -rf $HYDROGENCCACHE
 }
 
 create_kenzoccache() {
