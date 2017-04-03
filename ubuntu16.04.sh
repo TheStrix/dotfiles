@@ -25,10 +25,19 @@ gcc-multilib liblz4-* pngquant ncurses-dev texinfo gcc gperf patch libtool figle
 automake g++ gawk subversion expat libexpat1-dev python-all-dev bc libcloog-isl-dev \
 libcap-dev autoconf libgmp-dev build-essential gcc-multilib g++-multilib pkg-config libmpc-dev libmpfr-dev lzma* \
 liblzma* w3m android-tools-adb maven ncftp htop -y
-echo "Installing ccache"
-sudo install utils/ccache /usr/bin/
-echo "Installing ninja 1.7.2, please make sure your ROM includes the commit to use host ninja"
+echo "${yellow}Installing ninja 1.7.2, please make sure your ROM includes the commit to use host ninja"
 sudo install utils/ninja /usr/bin/
+echo "${yellow}Installing ccache from source"
+git clone git@github.com:ccache/ccache.git ~/ccache && cd ~/ccache && ./autogen.sh && ./configure && make
+sudo cp ccache /usr/local/bin/
+cd ~/.dotfiles
+sudo ln -s ccache /usr/local/bin/gcc
+sudo ln -s ccache /usr/local/bin/g++
+sudo ln -s ccache /usr/local/bin/cc
+sudo ln -s ccache /usr/local/bin/c++
+ccache -V
+echo "${yellow} ccache install completed... Deleting leftover installation files"
+rm -rf ~/ccache
 echo -e "${yellow}Dependencies have been installed${nc}"
 echo -e "${yellow}repo has been Downloaded!${nc}"
 if [ ! "$(which adb)" == "" ];
@@ -49,7 +58,7 @@ curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
 chmod a+x ~/bin/repo
 
 echo -e "${yellow}Setting up dotfiles${nc}"
-cd ~/dotfiles/
+cd ~/.dotfiles/
 ./setupdotfiles
 
 
