@@ -26,7 +26,7 @@ automake g++ gawk subversion expat libexpat1-dev python-all-dev bc libcloog-isl-
 libcap-dev autoconf libgmp-dev build-essential gcc-multilib g++-multilib pkg-config libmpc-dev libmpfr-dev lzma* \
 liblzma* w3m android-tools-adb maven ncftp htop -y
 echo "${yellow}Installing ninja 1.7.2, please make sure your ROM includes the commit to use host ninja"
-sudo install utils/ninja /usr/bin/
+sudo install utils/ninja /usr/local/bin/
 echo "${yellow}Installing ccache from source"
 git clone git@github.com:ccache/ccache.git ~/ccache && cd ~/ccache && ./autogen.sh && ./configure && make
 sudo cp ccache /usr/local/bin/
