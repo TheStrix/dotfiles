@@ -376,10 +376,8 @@ elif [ -n "$IMAGE" ]; then
     echo "${yellow}KILLING JACK SERVER${nc}"
     jack-kill
 elif [ -n "$AUDIT" ]; then
-    echo "cat "$AUDIT" | ./audit2allow -p ${OUT}/root/sepolicy"
-    cd ./external/selinux/policycoreutils/audit2allow/
-    cat "$AUDIT" | ./audit2allow -p ${OUT}/root/sepolicy
-    cd ../../../../
+    echo "cat "$AUDIT" | audit2allow -p ${OUT}/root/sepolicy"
+    cat "$AUDIT" | audit2allow -p ${OUT}/root/sepolicy
 else
     build_android "$CMD"
 fi
