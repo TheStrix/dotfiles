@@ -70,6 +70,7 @@ if [[ ! -e  $DIR ]]; then
 	mkdir -p $DIR
 fi
 
+# Logcat
 if [ "$LOGCAT" = "true" ]; then
 	if [[ -n "$SUFFIX" ]]; then
 		LOGCFILE="$DIR/log$SUFFIX.txt"
@@ -84,6 +85,7 @@ if [ "$LOGCAT" = "true" ]; then
 	fi
 fi
 
+# Dmesg
 if [ "$DMESG" = "true" ]; then
 	if [[ -n "$SUFFIX" ]]; then
 		DMFILE="$DIR/dm$SUFFIX.txt"
@@ -93,6 +95,7 @@ if [ "$DMESG" = "true" ]; then
 	adb shell dmesg > $DMFILE
 fi
 
+# Denials
 if [ "$DENIAL" = "true" ]; then
 	if [[ -n "$SUFFIX" ]]; then
 		DENFILE="$DIR/denial$SUFFIX.txt"
@@ -102,6 +105,7 @@ if [ "$DENIAL" = "true" ]; then
 	adb shell dmesg | grep -a 'avc: ' > $DENFILE
 fi
 
+# Radio Logcat
 if [ "$RADIO" = "true" ]; then
 	if [[ -n "$SUFFIX" ]]; then
 		RADFILE="$DIR/radio$SUFFIX.txt"
@@ -111,6 +115,7 @@ if [ "$RADIO" = "true" ]; then
 	adb shell logcat -b radio > $RADFILE
 fi
 
+# Console ramoops
 if [ "$RAMOOPS" = "true" ]; then
 	if [[ "$TARGET" = "kenzo" || "$TARGET" = "hydrogen" ]]; then
 		RAMF="/sys/fs/pstore/console-ramoops-0"
@@ -126,21 +131,29 @@ if [ "$RAMOOPS" = "true" ]; then
 	adb pull $RAMF
 fi
 
+# Select subl text editor if present, otherwise nano
+if [[ $(which subl) != "" ]]; then
+	EDITOR=subl
+else
+	EDITOR=nano
+fi
+
+# Open logged files
 if [[ "$OPEN" = "true" ]]; then
 	if [[ "$LOGCAT" = "true" ]]; then
-		subl $LOGCFILE
+		$EDITOR $LOGCFILE
 	fi
 	if [[ "$DMESG" = "true" ]]; then
-		subl $DMFILE
+		$EDITOR $DMFILE
 	fi
 	if [[ "$DENIAL" = "true" ]]; then
-		subl $DENFILE
+		$EDITOR $DENFILE
 	fi
 	if [[ "$RADIO" = "true" ]]; then
-		subl $RADFILE
+		$EDITOR $RADFILE
 	fi
 	if [[ "$RAMOOPS" = "true" ]]; then
-		subl $RAMFILE
+		$EDITOR $RAMFILE
 	fi
 fi
 
