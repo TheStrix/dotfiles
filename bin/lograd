@@ -1,0 +1,31 @@
+#!/bin/bash
+
+usage() {
+	cat <<USAGE
+
+Usage:
+		bash $0 <DEVICE_NAME> [LOGSUFFIX]
+
+Example: 	bash $0 kenzo 1
+		Dir is: /home/parth/Desktop/logs/kenzo
+		File is: /home/parth/Desktop/logs/kenzo/radio1.txt
+
+		bash $0 kenzo
+		Dir is: /home/parth/Desktop/logs/kenzo
+		File is: /home/parth/Desktop/logs/kenzo/radio.txt
+USAGE
+}
+
+if [[ $1 = "-h" ]]; then
+	usage
+	exit 0
+fi
+
+DIR=$HOME/Desktop/logs/$1
+FILE=$DIR/radio$2.txt
+#echo "Dir is: $DIR"
+#echo "File is: $FILE"
+if [[ ! -e  $DIR ]]; then
+	mkdir -p $DIR
+fi
+adb shell logcat -b radio > $FILE

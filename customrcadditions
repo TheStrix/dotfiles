@@ -62,14 +62,3 @@ alias grepandro='grep -i "\.so\|\.xml\|\.conf\|\.txt\|\.cfg\|\.dat"'
 #alias node3='ssh parth@198.199.71.201'
 alias jelly='ssh thestrix@67.205.162.137'
 alias shwarma='ssh parth@192.241.153.71'
-
-# LOGs
-alias kenzologcat='adb shell logcat > ~/Desktop/rn3log/log.txt'
-alias kenzoradiologcat='adb shell logcat -b radio > ~/Desktop/rn3log/radio.txt'
-alias kenzodmesg='adb shell dmesg > ~/Desktop/rn3log/dm.txt'
-alias kenzodenial="adb shell dmesg | grep -a 'avc: ' > ~/Desktop/rn3log/denial.txt"
-
-alias hydrogenlogcat='adb shell logcat > ~/Desktop/maxlog/log.txt'
-alias hydrogenradiologcat='adb shell logcat -b radio > ~/Desktop/maxlog/radio.txt'
-alias hydrogendmesg='adb shell dmesg > ~/Desktop/maxlog/dm.txt'
-alias hydrogendenial="adb shell dmesg | grep -a 'avc: ' > ~/Desktop/maxlog/denial.txt"
