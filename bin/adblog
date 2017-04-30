@@ -72,52 +72,52 @@ fi
 
 if [ "$LOGCAT" = "true" ]; then
 	if [[ -n "$SUFFIX" ]]; then
-		FILE="$DIR/log$SUFFIX.txt"
+		LOGCFILE="$DIR/log$SUFFIX.txt"
 	else
-		FILE=$DIR/log.txt
+		LOGCFILE=$DIR/log.txt
 	fi
 	if [[ "$LC" = "true" ]]; then
-		adb shell logcat > $FILE
+		adb shell logcat > $LOGCFILE
 		echo "Logcat started..."
 	else
-		adb shell logcat -d > $FILE
+		adb shell logcat -d > $LOGCFILE
 	fi
 fi
 
 if [ "$DMESG" = "true" ]; then
 	if [[ -n "$SUFFIX" ]]; then
-		FILE="$DIR/dm$SUFFIX.txt"
+		DMFILE="$DIR/dm$SUFFIX.txt"
 	else
-		FILE=$DIR/dm.txt
+		DMFILE=$DIR/dm.txt
 	fi
-	adb shell dmesg > $FILE
+	adb shell dmesg > $DMFILE
 fi
 
 if [ "$DENIAL" = "true" ]; then
 	if [[ -n "$SUFFIX" ]]; then
-		FILE="$DIR/denial$SUFFIX.txt"
+		DENFILE="$DIR/denial$SUFFIX.txt"
 	else
-		FILE=$DIR/denial.txt
+		DENFILE=$DIR/denial.txt
 	fi
-	adb shell dmesg | grep -a 'avc: ' > $FILE
+	adb shell dmesg | grep -a 'avc: ' > $DENFILE
 fi
 
 if [ "$RADIO" = "true" ]; then
 	if [[ -n "$SUFFIX" ]]; then
-		FILE="$DIR/radio$SUFFIX.txt"
+		RADFILE="$DIR/radio$SUFFIX.txt"
 	else
-		FILE=$DIR/radio.txt
+		RADFILE=$DIR/radio.txt
 	fi
-	adb shell logcat -b radio > $FILE
+	adb shell logcat -b radio > $RADFILE
 fi
 
 if [ "$RAMOOPS" = "true" ]; then
 	if [[ "$TARGET" = "kenzo" || "$TARGET" = "hydrogen" ]]; then
 		RAMF="/sys/fs/pstore/console-ramoops-0"
-		FILE="$DIR/console-ramoops-0"
+		RAMFILE="$DIR/console-ramoops-0"
 	else
 		RAMF="/sys/fs/pstore/console-ramoops"
-		FILE="$DIR/console-ramoops"
+		RAMFILE="$DIR/console-ramoops"
 	fi
 	adb root
 	sleep 2
@@ -127,7 +127,21 @@ if [ "$RAMOOPS" = "true" ]; then
 fi
 
 if [[ "$OPEN" = "true" ]]; then
-	subl $FILE
+	if [[ "$LOGCAT" = "true" ]]; then
+		subl $LOGCFILE
+	fi
+	if [[ "$DMESG" = "true" ]]; then
+		subl $DMFILE
+	fi
+	if [[ "$DENIAL" = "true" ]]; then
+		subl $DENFILE
+	fi
+	if [[ "$RADIO" = "true" ]]; then
+		subl $RADFILE
+	fi
+	if [[ "$RAMOOPS" = "true" ]]; then
+		subl $RAMFILE
+	fi
 fi
 
 #echo "Dir is: $DIR"
