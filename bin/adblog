@@ -1,0 +1,134 @@
+#!/bin/bash
+
+usage() {
+	cat <<USAGE
+
+Usage:
+		bash $0 <DEVICE_NAME> [OPTIONS]
+
+Examples: 	adblog 1 -l
+		Dir is: /home/parth/Desktop/logs/kenzo
+		File is: /home/parth/Desktop/logs/kenzo/log.txt
+
+		adblog kenzo -l
+		Dir is: /home/parth/Desktop/logs/kenzo
+		File is: /home/parth/Desktop/logs/kenzo/log.txt
+
+		adblog 1 -d -o
+		Log dmesg (-d) and open (-o)
+
+USAGE
+}
+
+# Setup getopt.
+long_opts="help,logcat,lcont,dmesg,denial,radio,ramoops,open,suffix:"
+getopt_cmd=$(getopt -o hlcdnros: --long "$long_opts" \
+            -n $(basename $0) -- "$@") || \
+            { echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
+
+eval set -- "$getopt_cmd"
+
+while true; do
+    case "$1" in
+        -h|--help) usage; exit 0;;
+        -l|--logcat) LOGCAT="true";;
+		-c|--lcont) LOGCAT="true"; LC="true";;
+		-d|--dmesg) DMESG="true";;
+		-n|--denial) DENIAL="true";;
+		-r|--radio) RADIO="true";;
+		--ramoops) RAMOOPS="true";;
+		-o|--open) OPEN="true";;
+        -s|--suffix) SUFFIX="$2"; shift;;
+        --) shift; break;;
+    esac
+    shift
+done
+
+# Mandatory argument
+if [ $# -eq 0 ]; then
+    echo -e "\nERROR: Missing mandatory argument: TARGET\n"
+    usage
+    exit 1
+fi
+if [ $# -gt 1 ]; then
+    echo -e "\nERROR: Extra inputs. Need TARGET only\n"
+    usage
+    exit 1
+fi
+if [[ $1 = "1" ]]; then
+	TARGET="kenzo"; shift
+elif [[ $1 = "2" ]]; then
+	TARGET="hydrogen"; shift
+elif [[ $1 = "3" ]]; then
+	TARGET="land"; shift
+else
+	TARGET="$1"; shift
+fi
+DIR=$HOME/Desktop/logs/$TARGET
+
+if [[ ! -e  $DIR ]]; then
+	mkdir -p $DIR
+fi
+
+if [ "$LOGCAT" = "true" ]; then
+	if [[ -n "$SUFFIX" ]]; then
+		FILE="$DIR/log$SUFFIX.txt"
+	else
+		FILE=$DIR/log.txt
+	fi
+	if [[ "$LC" = "true" ]]; then
+		adb shell logcat > $FILE
+		echo "Logcat started..."
+	else
+		adb shell logcat -d > $FILE
+	fi
+fi
+
+if [ "$DMESG" = "true" ]; then
+	if [[ -n "$SUFFIX" ]]; then
+		FILE="$DIR/dm$SUFFIX.txt"
+	else
+		FILE=$DIR/dm.txt
+	fi
+	adb shell dmesg > $FILE
+fi
+
+if [ "$DENIAL" = "true" ]; then
+	if [[ -n "$SUFFIX" ]]; then
+		FILE="$DIR/denial$SUFFIX.txt"
+	else
+		FILE=$DIR/denial.txt
+	fi
+	adb shell dmesg | grep -a 'avc: ' > $FILE
+fi
+
+if [ "$RADIO" = "true" ]; then
+	if [[ -n "$SUFFIX" ]]; then
+		FILE="$DIR/radio$SUFFIX.txt"
+	else
+		FILE=$DIR/radio.txt
+	fi
+	adb shell logcat -b radio > $FILE
+fi
+
+if [ "$RAMOOPS" = "true" ]; then
+	if [[ "$TARGET" = "kenzo" || "$TARGET" = "hydrogen" ]]; then
+		RAMF="/sys/fs/pstore/console-ramoops-0"
+		FILE="$DIR/console-ramoops-0"
+	else
+		RAMF="/sys/fs/pstore/console-ramoops"
+		FILE="$DIR/console-ramoops"
+	fi
+	adb root
+	sleep 2
+	adb remount
+	cd $DIR
+	adb pull $RAMF
+fi
+
+if [[ "$OPEN" = "true" ]]; then
+	subl $FILE
+fi
+
+#echo "Dir is: $DIR"
+#echo "File is: $FILE"
