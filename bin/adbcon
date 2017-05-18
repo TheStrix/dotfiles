@@ -19,13 +19,16 @@ OPTIONS:
 	-r, --root
 		Connects to adb as root and also do adb remount
 
+	-k, --kill
+		Kill adb server first
+
 
 USAGE
 }
 
 # Setup getopt.
-long_opts="help,root"
-getopt_cmd=$(getopt -o hr --long "$long_opts" \
+long_opts="help,root,kill"
+getopt_cmd=$(getopt -o hrk --long "$long_opts" \
             -n $(basename $0) -- "$@") || \
             { echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
 
@@ -35,6 +38,7 @@ while true; do
     case "$1" in
         -h|--help) usage; exit 0;;
         -r|--root) ADBROOT="true";;
+        -k|--kill) ADBKILL="true";;
         --) shift; break;;
     esac
     shift
@@ -54,6 +58,10 @@ fi
 
 LASTPART_DEVICE_IP="$1"; shift
 
+if [[ "$ADBKILL" = "true" ]]; then
+	echo -e "${yellow}Killing adb server${nc}"
+	adb kill-server
+fi
 
 # CONNECT FUNC
 connect() {
