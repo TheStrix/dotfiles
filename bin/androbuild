@@ -29,6 +29,25 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+# Colors
+black='\e[0;30m'
+blue='\e[0;34m'
+green='\e[0;32m'
+cyan='\e[0;36m'
+red='\e[0;31m'
+purple='\e[0;35m'
+brown='\e[0;33m'
+lightgray='\e[0;37m'
+darkgray='\e[1;30m'
+lightblue='\e[1;34m'
+lightgreen='\e[1;32m'
+lightcyan='\e[1;36m'
+lightred='\e[1;31m'
+lightpurple='\e[1;35m'
+yellow='\e[1;33m'
+white='\e[1;37m'
+nc='\e[0m'
+
 set -o errexit
 
 usage() {
@@ -169,7 +188,7 @@ build_module() {
 }
 
 build_project() {
-    echo -e "\nINFO: Build $PROJECT for $TARGET\n"
+    echo -e "${yellow}\nINFO: Build $PROJECT for $TARGET\n${nc}"
     if [ "$LOG" = "true" ]; then
       mmm $PROJECT | tee $LOG_FILE.log
     else
@@ -178,7 +197,7 @@ build_project() {
 }
 
 update_api() {
-    echo -e "\nINFO: Updating APIs\n"
+    echo -e "${yellow}\nINFO: Updating APIs\n${nc}"
     if [ "$LOG" = "true" ]; then
       make update-api | tee $LOG_FILE.log
     else
@@ -211,13 +230,13 @@ delete_hydrogenccache() {
 }
 
 create_kenzoccache() {
-    echo -e "${yellow}\nINFO: Setting kenzo CCACHE with 25 GB\n${nc}"
+    echo -e "${lightgreen}\nINFO: Setting kenzo CCACHE with 25 GB\n${nc}"
     setup_kenzoccache
     ccache -M 25G
 }
 
 create_hydrogenccache() {
-    echo -e "${yellow}\nINFO: Setting hydrogen CCACHE with 25 GB\n${nc}"
+    echo -e "${lightgreen}\nINFO: Setting hydrogen CCACHE with 25 GB\n${nc}"
     setup_hydrogenccache
     ccache -M 25G
 }
@@ -238,7 +257,7 @@ long_opts="clean_build,dirty_build,delete_ccache,upload,release,debug,help,image
 long_opts+="project:,setup_ccache:,update-api,build_variant:,audit:"
 getopt_cmd=$(getopt -o cnturdhi:j:k:lm:p:s:av:x: --long "$long_opts" \
             -n $(basename $0) -- "$@") || \
-            { echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
+            { echo -e "${lightred}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
 
 eval set -- "$getopt_cmd"
 
@@ -268,12 +287,12 @@ done
 
 # Mandatory argument
 if [ $# -eq 0 ]; then
-    echo -e "\nERROR: Missing mandatory argument: TARGET_PRODUCT\n"
+    echo -e "${lightred}\nERROR: Missing mandatory argument: TARGET_PRODUCT\n${nc}"
     usage
     exit 1
 fi
 if [ $# -gt 1 ]; then
-    echo -e "\nERROR: Extra inputs. Need TARGET_PRODUCT only\n"
+    echo -e "${lightred}\nERROR: Extra inputs. Need TARGET_PRODUCT only\n${nc}"
     usage
     exit 1
 fi
@@ -294,24 +313,24 @@ fi
 if [[ "$DELTE_CCACHE" = "true" ]]; then
   if [[ "$TARGET" = "kenzo" ]];
   then
-    echo "${yellow}Clearing kenzo CCACHE dir $KENZOCCACHE${nc}"
+    echo -e "${lightgreen}Clearing kenzo CCACHE dir $KENZOCCACHE${nc}"
     delete_kenzoccache
   fi
   if [[ "$TARGET" = "hydrogen" ]];
   then
-    echo "${yellow}Clearing hydrogen CCACHE dir $HYDROGENCCACHE${nc}"
+    echo -e "${lightgreen}Clearing hydrogen CCACHE dir $HYDROGENCCACHE${nc}"
     delete_hydrogenccache
   fi
 fi
 
 if [[ ! -e $KENZOCCACHE ]]; then
-  echo "${yellow}Kenzo CCACHE dir $KENZOCCACHE not found... Creating and setting it up!${nc}"
+  echo -e "${lightgreen}Kenzo CCACHE dir $KENZOCCACHE not found... Creating and setting it up!${nc}"
   mkdir $KENZOCCACHE
   create_kenzoccache
 fi
 
 if [[ ! -e $HYDROGENCCACHE ]]; then
-  echo "${yellow}hydrogen CCACHE dir $HYDROGENCCACHE not found... Creating and setting it up!${nc}"
+  echo -e "${lightgreen}hydrogen CCACHE dir $HYDROGENCCACHE not found... Creating and setting it up!${nc}"
   mkdir $HYDROGENCCACHE
   create_hydrogenccache
 fi
@@ -319,12 +338,12 @@ fi
 if [ "$CCACHE" = "true" ]; then
   if [[ "$TARGET" = "kenzo" ]];
   then
-    echo "${yellow}Setting up kenzo CCACHE dir $KENZOCCACHE${nc}"
+    echo -e "${lightgreen}Setting up kenzo CCACHE dir $KENZOCCACHE${nc}"
     setup_kenzoccache
   fi
   if [[ "$TARGET" = "hydrogen" ]];
   then
-    echo "${yellow}Setting up hydrogen CCACHE dir $HYDROGENCCACHE${nc}"
+    echo -e "${lightgreen}Setting up hydrogen CCACHE dir $HYDROGENCCACHE${nc}"
     setup_hydrogenccache
   fi
 fi
@@ -352,53 +371,53 @@ fi
 
 if [ "$UPDATE_API" = "true" ]; then
     update_api
-    echo "${yellow}KILLING JACK SERVER${nc}"
+    echo -e "${lightcyan}KILLING JACK SERVER${nc}"
     jack-kill
     exit 0
 fi
 
 if [ -n "$MODULE" ]; then
     build_module "$CMD"
-    echo "${yellow}KILLING JACK SERVER${nc}"
+    echo -e "${lightcyan}KILLING JACK SERVER${nc}"
     jack-kill
 elif [ -n "$PROJECT" ]; then
     build_project
-    echo "${yellow}KILLING JACK SERVER${nc}"
+    echo -e "${lightcyan}KILLING JACK SERVER${nc}"
     jack-kill
 elif [ -n "$IMAGE" ]; then
     if [[ "$IMAGE" == "recoveryimg" ]]; then
-      echo "Please enter TW_DEVICE_VERSION: "
+      echo -e "${lightpurple}Please enter TW_DEVICE_VERSION: ${nc}"
       read TW_DEVICE_VERSION
-      echo "Setting TW_DEVICE_VERSION=$TW_DEVICE_VERSION"
+      echo -e "${lightpurple}Setting TW_DEVICE_VERSION=$TW_DEVICE_VERSION${nc}"
       export TW_DEVICE_VERSION=$TW_DEVICE_VERSION
     fi
     build_$IMAGE "$CMD"
-    echo "${yellow}KILLING JACK SERVER${nc}"
+    echo -e "${lightcyan}KILLING JACK SERVER${nc}"
     jack-kill
 elif [ -n "$AUDIT" ]; then
-    echo "cat "$AUDIT" | audit2allow -p ${OUT}/root/sepolicy"
+    echo -e "${lightblue}cat "$AUDIT" | audit2allow -p ${OUT}/root/sepolicy${nc}"
     cat "$AUDIT" | audit2allow -p ${OUT}/root/sepolicy
 else
     build_android "$CMD"
 fi
 
-echo "${yellow}KILLING JACK SERVER${nc}"
+echo -e "${lightcyan}KILLING JACK SERVER${nc}"
 jack-kill
 
 if [[ "$UPLOAD" = "true" ]]; then
   if [[ "$CURDIR" = "lineage" ]]; then
     if [[ "$TARGET" = "kenzo" ]]; then
-      echo "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
+      echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
       gdrive upload --parent 0B9JxQ_RHblHkZWpaejlPNUtjVEk ${OUT}/lineage-*.zip
     elif [[ "$TARGET" = "hydrogen" ]]; then
-      echo "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
+      echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
       gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ${OUT}/lineage-*.zip
     else
-      echo "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
+      echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
       gdrive upload ${OUT}/lineage-*.zip
     fi
   else
-    echo "${yellow}Upload configured only for LineageOS${nc}"
+    echo -e "${yellow}Upload configured only for LineageOS${nc}"
   fi
 fi
 
@@ -406,6 +425,6 @@ if [[ "$RELEASE" = "true" ]]; then
   if [[ "$CURDIR" = "lineage" ]]; then
     afh ${OUT}/lineage-*.zip
   else
-    echo "${yellow}Upload configured only for LineageOS${nc}"
+    echo -e "${yellow}Upload configured only for LineageOS${nc}"
   fi
 fi

@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# COLORS
+lightgreen='\e[1;32m'
+red='\e[0;31m'
+yellow='\e[1;33m'
+nc='\e[0m'
+
 usage() {
 	cat <<USAGE
 
@@ -16,6 +22,32 @@ Examples: 	adblog 1 -l
 
 		adblog 1 -d -o
 		Log dmesg (-d) and open (-o)
+
+OPTIONS:
+	-h, --help
+		Display this help message
+
+	-l, --logcat
+		Take logcat of events till that time and stop.
+
+	-c, --lcont
+		Take live logcat of events (Quit by pressing Ctrl + C/Z). Also -o won't work with it.
+
+	-d, --dmesg
+		Take dmesg
+
+	-n, --denial
+		Take SELinux denials (greps denials from dmesg)
+
+	-r, --radio
+		Take radio log
+
+	-o, --open
+		Open the logged files (Default: subl, if no subl opens in nano)
+
+	-s, --suffix
+		Add suffix to the end of the logged file name (To prevent file overwrite)
+
 
 USAGE
 }
@@ -46,12 +78,12 @@ done
 
 # Mandatory argument
 if [ $# -eq 0 ]; then
-    echo -e "\nERROR: Missing mandatory argument: TARGET\n"
+    echo -e "${red}\nERROR: Missing mandatory argument: TARGET\n${nc}"
     usage
     exit 1
 fi
 if [ $# -gt 1 ]; then
-    echo -e "\nERROR: Extra inputs. Need TARGET only\n"
+    echo -e "${red}\nERROR: Extra inputs. Need TARGET only\n${nc}"
     usage
     exit 1
 fi
@@ -79,7 +111,7 @@ if [ "$LOGCAT" = "true" ]; then
 	fi
 	if [[ "$LC" = "true" ]]; then
 		adb shell logcat > $LOGCFILE
-		echo "Logcat started..."
+		echo -e "${yellow}Logcat started...${nc}"
 	else
 		adb shell logcat -d > $LOGCFILE
 	fi
@@ -157,5 +189,5 @@ if [[ "$OPEN" = "true" ]]; then
 	fi
 fi
 
-#echo "Dir is: $DIR"
-#echo "File is: $FILE"
+#echo -e "${lightgreen}Dir is: $DIR${nc}"
+#echo -e "${lightgreen}File is: $FILE${nc}"
