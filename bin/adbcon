@@ -1,0 +1,73 @@
+#!/bin/bash
+
+yellow='\e[1;33m'
+nc='\e[0m'
+
+usage() {
+	cat <<USAGE
+
+Usage:
+		bash $0 <LASTPART_DEVICE_IP> [OPTIONS]
+
+Examples: 	adbcon 104 -r
+		Connects adb to IP 192.168.1.104 (104 from user param) as root
+
+OPTIONS:
+	-h, --help
+		Display this help message
+
+	-r, --root
+		Connects to adb as root and also do adb remount
+
+
+USAGE
+}
+
+# Setup getopt.
+long_opts="help,root"
+getopt_cmd=$(getopt -o hr --long "$long_opts" \
+            -n $(basename $0) -- "$@") || \
+            { echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
+
+eval set -- "$getopt_cmd"
+
+while true; do
+    case "$1" in
+        -h|--help) usage; exit 0;;
+        -r|--root) ADBROOT="true";;
+        --) shift; break;;
+    esac
+    shift
+done
+
+# Mandatory argument
+if [ $# -eq 0 ]; then
+    echo -e "\nERROR: Missing mandatory argument: LASTPART_DEVICE_IP\n"
+    usage
+    exit 1
+fi
+if [ $# -gt 1 ]; then
+    echo -e "\nERROR: Extra inputs. Need LASTPART_DEVICE_IP only\n"
+    usage
+    exit 1
+fi
+
+LASTPART_DEVICE_IP="$1"; shift
+
+
+# CONNECT FUNC
+connect() {
+	adb connect 192.168.1.$LASTPART_DEVICE_IP
+}
+
+connect
+
+if [[ "$ADBROOT" = "true" ]]; then
+	sleep 2
+	echo -e "${yellow}Starting adb as root${nc}"
+	adb root
+	sleep 2
+	connect
+	echo -e "${yellow}Exec 'adb remount'${nc}"
+	adb remount
+fi
