@@ -39,6 +39,7 @@ echo -ne "${cyan}";upinfo;echo ""
 #------------------------------------------///
 # EXPORTS:
 #------------------------------------------///
+export EDITOR=nano
 export TZ=Asia/Kolkata
 export KBUILD_BUILD_USER=ParthB
 export USE_CCACHE=1
