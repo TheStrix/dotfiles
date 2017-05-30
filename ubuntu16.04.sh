@@ -15,6 +15,25 @@
 # Please maintain this if you use this script or any part of it
 #
 
+# Colors
+black='\e[0;30m'
+blue='\e[0;34m'
+green='\e[0;32m'
+cyan='\e[0;36m'
+red='\e[0;31m'
+purple='\e[0;35m'
+brown='\e[0;33m'
+lightgray='\e[0;37m'
+darkgray='\e[1;30m'
+lightblue='\e[1;34m'
+lightgreen='\e[1;32m'
+lightcyan='\e[1;36m'
+lightred='\e[1;31m'
+lightpurple='\e[1;35m'
+yellow='\e[1;33m'
+white='\e[1;37m'
+nc='\e[0m'
+
 clear
 echo -e "${yellow}Installing Dependencies!${nc}"
 sudo apt update -y
@@ -83,11 +102,6 @@ if echo -e "$answer" | grep -iq "^y" ;then
     . build/envsetup.sh
     echo -e "${yellow}syncing xiaomi vendor${nc}"
     git clone git@github.com:TheMuppets/proprietary_vendor_xiaomi.git -b cm-14.1 ~/lineage/vendor/xiaomi
-    echo -ne "${yellow}Install ImageMagic? (y/n)${nc}"
-    read answer
-    if echo "$answer" | grep -iq "^y" ;then
-        imagemagicinstall
-    fi
 else
     echo
 fi
