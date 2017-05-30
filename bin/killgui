@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Stop sddm service, if it exists.    
+if service --status-all | grep -Fq 'sddm'; then    
+  sudo service sddm stop    
+fi
+# Stop lightdm service, if it exists.    
+if service --status-all | grep -Fq 'lightdm'; then    
+  sudo service lightdm stop    
+fi
+# Stop gdm service, if it exists.    
+if service --status-all | grep -Fq 'gdm'; then    
+  sudo service gdm stop    
+fi
