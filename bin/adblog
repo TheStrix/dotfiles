@@ -156,9 +156,8 @@ if [ "$RAMOOPS" = "true" ]; then
 		RAMF="/sys/fs/pstore/console-ramoops"
 		RAMFILE="$DIR/console-ramoops"
 	fi
-	adb root
-	sleep 2
-	adb remount
+	adb wait-for-device root
+	adb wait-for-device remount
 	cd $DIR
 	adb pull $RAMF
 fi

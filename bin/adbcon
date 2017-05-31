@@ -71,11 +71,9 @@ connect() {
 connect
 
 if [[ "$ADBROOT" = "true" ]]; then
-	sleep 2
 	echo -e "${yellow}Starting adb as root${nc}"
-	adb root
-	sleep 2
+	adb wait-for-device root
 	connect
 	echo -e "${yellow}Exec 'adb remount'${nc}"
-	adb remount
+	adb wait-for-device remount
 fi
