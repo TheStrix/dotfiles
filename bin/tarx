@@ -1,0 +1,6 @@
+#!/bin/bash
+
+yellow='\e[1;33m'
+nc='\e[0m'
+
+tar -xzvf $1 $2
