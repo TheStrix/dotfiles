@@ -88,20 +88,3 @@ if echo -e "$answer" | grep -iq "^y" ;then
 else
     echo
 fi
-
-echo -ne "${yellow}Do you wish sync LineageOS and breakfast kenzo and hydrogen? (y/n)${nc}"
-read answer
-if echo -e "$answer" | grep -iq "^y" ;then
-    mkdir ~/lineage
-    cd ~/lineage
-    repo init -u git://github.com/LineageOS/android.git -b cm-14.1
-    echo -e "${yellow}syncing kenzo and hydrogen trees as well${nc}"
-    mkdir ~/lineage/.repo/local_manifests/
-    wget -O ~/lineage/.repo/local_manifests/roomservice.xml "https://gist.githubusercontent.com/TheStrix/8647c1126a915084a734b03a56bb0ade/raw/fa8fe45f33dabd3a6acec9d1da9176c3a6d6d8ed/roomservice.xml"
-    syncc -j12
-    . build/envsetup.sh
-    echo -e "${yellow}syncing xiaomi vendor${nc}"
-    git clone git@github.com:TheMuppets/proprietary_vendor_xiaomi.git -b cm-14.1 ~/lineage/vendor/xiaomi
-else
-    echo
-fi

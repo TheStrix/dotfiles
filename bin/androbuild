@@ -208,6 +208,7 @@ update_api() {
 # CCACHE
 KENZOCCACHE=$HOME/.kenzoccache/
 HYDROGENCCACHE=$HOME/.hydrogenccache/
+SAGITCCACHE=$HOME/.sagitccache/
 
 setup_kenzoccache() {
   export CCACHE_DIR=$KENZOCCACHE
@@ -216,6 +217,11 @@ setup_kenzoccache() {
 
 setup_hydrogenccache() {
   export CCACHE_DIR=$HYDROGENCCACHE
+  export USE_CCACHE=1
+}
+
+setup_sagitccache() {
+  export CCACHE_DIR=$SAGITCCACHE
   export USE_CCACHE=1
 }
 
@@ -229,6 +235,11 @@ delete_hydrogenccache() {
     ccache -C
 }
 
+delete_sagitccache() {
+  export CCACHE_DIR=$SAGITCCACHE
+  ccache -C
+}
+
 create_kenzoccache() {
     echo -e "${lightgreen}\nINFO: Setting kenzo CCACHE with 25 GB\n${nc}"
     setup_kenzoccache
@@ -238,6 +249,12 @@ create_kenzoccache() {
 create_hydrogenccache() {
     echo -e "${lightgreen}\nINFO: Setting hydrogen CCACHE with 25 GB\n${nc}"
     setup_hydrogenccache
+    ccache -M 25G
+}
+
+create_sagitccache() {
+  echo -e "${lightgreen}\nINFO: Setting sagit CCACHE with 25 GB\n${nc}"
+    setup_sagitccache
     ccache -M 25G
 }
 
@@ -321,18 +338,34 @@ if [[ "$DELTE_CCACHE" = "true" ]]; then
     echo -e "${lightgreen}Clearing hydrogen CCACHE dir $HYDROGENCCACHE${nc}"
     delete_hydrogenccache
   fi
+  if [[ "$TARGET" = "sagit" ]]; then
+    echo -e "${lightgreen}Clearing sagit CCACHE dir $SAGITCCACHE${nc}"
+    delete_sagitccache
+  fi
 fi
 
-if [[ ! -e $KENZOCCACHE ]]; then
-  echo -e "${lightgreen}Kenzo CCACHE dir $KENZOCCACHE not found... Creating and setting it up!${nc}"
-  mkdir $KENZOCCACHE
-  create_kenzoccache
+if [[ "$TARGET" = "kenzo" ]]; then
+  if [[ ! -e $KENZOCCACHE ]]; then
+    echo -e "${lightgreen}Kenzo CCACHE dir $KENZOCCACHE not found... Creating and setting it up!${nc}"
+    mkdir $KENZOCCACHE
+    create_kenzoccache
+  fi
 fi
 
-if [[ ! -e $HYDROGENCCACHE ]]; then
-  echo -e "${lightgreen}hydrogen CCACHE dir $HYDROGENCCACHE not found... Creating and setting it up!${nc}"
-  mkdir $HYDROGENCCACHE
-  create_hydrogenccache
+if [[ "$TARGET" = "hydrogen" ]]; then
+  if [[ ! -e $HYDROGENCCACHE ]]; then
+    echo -e "${lightgreen}hydrogen CCACHE dir $HYDROGENCCACHE not found... Creating and setting it up!${nc}"
+    mkdir $HYDROGENCCACHE
+    create_hydrogenccache
+  fi
+fi
+
+if [[ "$TARGET" = "sagit" ]]; then
+  if [[ ! -e $SAGITCCACHE ]]; then
+    echo -e "${lightgreen}sagit CCACHE dir $SAGITCCACHE not found... Creating and setting it up!${nc}"
+    mkdir $SAGITCCACHE
+    create_sagitccache
+  fi
 fi
 
 if [ "$CCACHE" = "true" ]; then
@@ -345,6 +378,10 @@ if [ "$CCACHE" = "true" ]; then
   then
     echo -e "${lightgreen}Setting up hydrogen CCACHE dir $HYDROGENCCACHE${nc}"
     setup_hydrogenccache
+  fi
+  if [[ "$TARGET" = "sagit" ]]; then
+    echo -e "${lightgreen}Setting up sagit CCACHE dir $SAGITCCACHE${nc}"
+    setup_sagitccache
   fi
 fi
 
@@ -412,6 +449,9 @@ if [[ "$UPLOAD" = "true" ]]; then
     elif [[ "$TARGET" = "hydrogen" ]]; then
       echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
       gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ${OUT}/lineage-*.zip
+    elif [[ "$TARGET" = "sagit" ]]; then
+      echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
+      gdrive upload --parent 0B9JxQ_RHblHkemswTVRkTERYdXM ${OUT}/lineage-*.zip
     else
       echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
       gdrive upload ${OUT}/lineage-*.zip
