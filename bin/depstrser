@@ -1,0 +1,8 @@
+#!/bin/bash
+process_file() {
+	strings $1 | grep -i "\.so\|\.xml\|\.conf\|\.txt\|\.cfg\|\.dat"
+}
+
+for lib in $*; do
+	process_file $lib
+done

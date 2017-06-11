@@ -1,0 +1,10 @@
+#!/bin/bash
+process_file() {
+	strings $1 | grep -si "$last"
+}
+
+for last; do true; done
+
+for lib in ${@:1:$(($#-1))}; do
+	process_file $lib
+done
