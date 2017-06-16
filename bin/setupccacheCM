@@ -1,6 +1,0 @@
-#!/bin/bash
-
-cd /home/parth/cm
-
-export USE_CCACHE=1
-./prebuilts/misc/linux-x86/ccache/ccache -M 50
