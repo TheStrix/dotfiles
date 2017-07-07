@@ -39,11 +39,11 @@ echo -e "${yellow}Installing Dependencies!${nc}"
 sudo apt update -y
 sudo apt install git-core python gnupg flex bison gperf libsdl1.2-dev libesd0-dev \
 squashfs-tools build-essential zip curl libncurses5-dev zlib1g-dev openjdk-8-jre openjdk-8-jdk pngcrush \
-schedtool libxml2 libxml2-utils xsltproc lzop libc6-dev schedtool g++-multilib lib32ncurses5-dev \
-gcc-multilib liblz4-* pngquant ncurses-dev texinfo gcc gperf patch libtool figlet \
-automake g++ gawk subversion expat libexpat1-dev python-all-dev bc libcloog-isl-dev \
-libcap-dev autoconf libgmp-dev build-essential gcc-multilib g++-multilib pkg-config libmpc-dev libmpfr-dev lzma* \
-liblzma* w3m android-tools-adb maven ncftp htop -y
+libxml2 libxml2-utils xsltproc lzop libc6-dev schedtool g++-multilib lib32ncurses5-dev lib32readline-dev \
+lib32z1-dev libesd0-dev gcc-multilib liblz4-* pngquant ncurses-dev texinfo gcc patch libtool figlet libwxgtk3.0-dev \
+automake g++ gawk subversion expat libexpat1-dev python-all-dev bc libcloog-isl-dev libssl-dev \
+libcap-dev autoconf libgmp-dev pkg-config libmpc-dev libmpfr-dev lzma* rsync \
+liblzma* w3m android-tools-adb maven ncftp htop imagemagick -y
 echo "${yellow}Installing ninja 1.7.2, please make sure your ROM includes the commit to use host ninja"
 sudo install utils/ninja /usr/local/bin/
 echo "${yellow}Installing ccache from source"
