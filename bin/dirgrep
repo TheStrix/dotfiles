@@ -1,2 +1,2 @@
 #!/bin/bash
-grep -Rsi "$1" .
+grep -Rsi "$1" . --exclude-dir=.git/
