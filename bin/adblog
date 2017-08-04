@@ -164,9 +164,12 @@ if [ "$RAMOOPS" = "true" ]; then
 	adb pull $RAMF
 fi
 
-# Select subl text editor if present, otherwise nano
-if [[ $(which subl) != "" ]]; then
-	EDITOR=subl
+# Use subl text editor if present, otherwise nano
+#if [[ $(which subl) != "" ]]; then
+#	EDITOR=subl
+# Use atom text editor if present, otherwise nano
+if [[ $(which atom) != "" ]]; then
+	EDITOR=atom
 else
 	EDITOR=nano
 fi
