@@ -165,11 +165,8 @@ if [ "$RAMOOPS" = "true" ]; then
 fi
 
 # Use subl text editor if present, otherwise nano
-#if [[ $(which subl) != "" ]]; then
-#	EDITOR=subl
-# Use atom text editor if present, otherwise nano
-if [[ $(which atom) != "" ]]; then
-	EDITOR=atom
+if [[ $(which subl) != "" ]]; then
+	EDITOR=subl
 else
 	EDITOR=nano
 fi
