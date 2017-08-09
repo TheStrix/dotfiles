@@ -211,9 +211,16 @@ update_api() {
 }
 
 # CCACHE
-KENZOCCACHE=$HOME/.kenzoccache/
-HYDROGENCCACHE=$HOME/.hydrogenccache/
-SAGITCCACHE=$HOME/.sagitccache/
+if [[ "$HOST" = "Triton" ]]; then
+  KENZOCCACHE=/work/Android/.kenzoccache/
+  HYDROGENCCACHE=/work/Android/.hydrogenccache/
+  SAGITCCACHE=/work/Android/.sagitccache/
+else
+  KENZOCCACHE=$HOME/.kenzoccache/
+  HYDROGENCCACHE=$HOME/.hydrogenccache/
+  SAGITCCACHE=$HOME/.sagitccache/
+fi
+
 
 setup_kenzoccache() {
   export CCACHE_DIR=$KENZOCCACHE
@@ -443,7 +450,7 @@ fi
 TIME_END=$(date +%s.%N)
 
 # Kill jack server
-jack-kill
+. $CURDIR/prebuilts/sdk/tools/jack-admin kill-server
 
 if [[ "$UPLOAD" = "true" ]]; then
   if [[ "$CURDIR" = "lineage" ]]; then

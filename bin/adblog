@@ -13,12 +13,12 @@ Usage:
 		bash $0 <DEVICE_NAME> [OPTIONS]
 
 Examples: 	adblog 1 -l
-		Dir is: /home/parth/Desktop/logs/kenzo
-		File is: /home/parth/Desktop/logs/kenzo/log.txt
+		Dir is: /work/Android/logs/kenzo
+		File is: /work/Android/logs/kenzo/log.txt
 
 		adblog kenzo -l
-		Dir is: /home/parth/Desktop/logs/kenzo
-		File is: /home/parth/Desktop/logs/kenzo/log.txt
+		Dir is: /work/Android/logs/kenzo
+		File is: /work/Android/logs/kenzo/log.txt
 
 		adblog 1 -d -o
 		Log dmesg (-d) and open (-o)
@@ -98,7 +98,11 @@ elif [[ $1 = "4" ]]; then
 else
 	TARGET="$1"; shift
 fi
-DIR=$HOME/Desktop/logs/$TARGET
+if [[ "$HOST" = "Triton" ]]; then
+	DIR=/work/Android/logs/$TARGET
+else
+	DIR=$HOME/logs/$TARGET
+fi
 
 if [[ ! -e  $DIR ]]; then
 	mkdir -p $DIR

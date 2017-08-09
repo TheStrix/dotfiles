@@ -1,5 +1,0 @@
-#!/bin/bash
-
-make O=../out ARCH=arm64 CROSS_COMPILE="/home/parth/cm/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-" cyanogenmod_hydrogen_defconfig
-
-make O=../out ARCH=arm64 CROSS_COMPILE="/home/parth/cm/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-" -j8
