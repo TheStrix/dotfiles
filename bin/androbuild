@@ -211,7 +211,7 @@ update_api() {
 }
 
 # CCACHE
-if [[ "$HOST" = "Triton" ]]; then
+if [ $(hostname -s) = "Triton" ]; then
   KENZOCCACHE=/work/Android/.kenzoccache/
   HYDROGENCCACHE=/work/Android/.hydrogenccache/
   SAGITCCACHE=/work/Android/.sagitccache/

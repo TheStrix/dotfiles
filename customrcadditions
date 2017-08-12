@@ -63,7 +63,7 @@ alias gtcp='git cherry-pick'
 alias grev='git revert'
 alias glog='git log --pretty=format:"%h - %an : %s"'
 alias yufastboot='fastboot -i 0x2A96'
-if [[ "$HOST" = "Triton" ]]; then
+if [[ $(hostname -s) = "Triton" ]]; then
 	alias makekernel='make ARCH=arm64 CROSS_COMPILE="/work/Android/lineage/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
 	alias makeoutkernel='make O=../out ARCH=arm64 CROSS_COMPILE="/work/Android/lineage/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
 else
