@@ -98,7 +98,7 @@ elif [[ $1 = "4" ]]; then
 else
 	TARGET="$1"; shift
 fi
-if [[ $(hostname -s) = "Triton" ]]; then
+if [[ "$(mount | grep work)" ]]; then
 	DIR=/work/Android/logs/$TARGET
 else
 	DIR=$HOME/logs/$TARGET
