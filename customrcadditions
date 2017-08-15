@@ -23,8 +23,13 @@ nc='\e[0m'
 
 if [[ "$(mount | grep work)" ]]; then
     WORKDIR="/work";
+    LINEAGEDIR="/work/Android/lineage";
+    PADIR="/work/Android/pa";
 
     export PATH=${WORKDIR}/bin:${WORKDIR}/Android/Sdk/platform-tools:$PATH
+else
+    LINEAGEDIR="${HOME}/lineage";
+    PADIR="${HOME}/pa";
 fi
 
 function upinfo ()
@@ -49,11 +54,11 @@ export EDITOR=nano
 export TZ=Asia/Kolkata
 export KBUILD_BUILD_USER=ParthB
 export USE_CCACHE=1
-# Jack is the new Java compiler used from Lineage 14. It is known to run out of memory - a simple fix is to run this command:
+# Jack is the new Java compiler used from Android 7. It is known to run out of memory - a simple fix is to run this command:
 export ANDROID_JACK_VM_ARGS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4G"
 
 #------------------------------------------////
-# ALIAS:
+# System Alias:
 #------------------------------------------////
 alias shutdown='sudo shutdown -P now'
 alias gtcp='git cherry-pick'
@@ -65,13 +70,46 @@ alias setperf='echo "performance" | sudo tee /sys/devices/system/cpu/cpu*/cpufre
 alias setsave='echo "powersave" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor'
 alias path='echo ${PATH}'
 alias android-studio='sh /opt/android-studio/bin/studio.sh'
+alias makekernel='make ARCH=arm64 CROSS_COMPILE="${LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
+alias makeoutkernel='make O=../out ARCH=arm64 CROSS_COMPILE="${LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
+alias laos='cd ${LINEAGEDIR}'
+alias pa='cd ${PADIR}'
 
-if [[ $(hostname -s) = "Triton" ]]; then
-	alias makekernel='make ARCH=arm64 CROSS_COMPILE="/work/Android/lineage/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
-	alias makeoutkernel='make O=../out ARCH=arm64 CROSS_COMPILE="/work/Android/lineage/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
-	alias objdump_aarch64='/work/Android/*/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump'
+if [[ -f ${PADIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump ]]; then
+	alias objdump_aarch64='${PADIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump'
+elif [[ -f ${LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump ]]; then
+	alias objdump_aarch64='${LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump'
 else
-	alias makekernel='make ARCH=arm64 CROSS_COMPILE="/home/parth/lineage/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
-	alias makeoutkernel='make O=../out ARCH=arm64 CROSS_COMPILE="/home/parth/lineage/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
+	alias objdump_aarch64='echo -e "${lightred}objdump file path not found!\nMake sure you have LAOS/PA source code syned.\nCheck custombashrc for more.${nc}"'
 fi
 
+
+#------------------------------------------////
+# LAOS alias
+#------------------------------------------////
+alias sagitlaos_d='cd ${LINEAGEDIR}/device/xiaomi/sagit'
+alias sagitlaod_k='cd ${LINEAGEDIR}/kernel/xiaomi/msm8998'
+alias sagitloas_v='cd ${LINEAGEDIR}/vendor/xiaomi/sagit'
+
+alias kenzolaos_d='cd ${LINEAGEDIR}/device/xiaomi/kenzo'
+alias kenzolaos_k='cd ${LINEAGEDIR}/kernel/xiaomi/msm8956'
+alias kenzolaos_v='cd ${LINEAGEDIR}/vendor/xiaomi/kenzo'
+
+alias hydrogenlaos_d='cd ${LINEAGEDIR}/device/xiaomi/hydrogen'
+alias hydrogenlaos_k='cd ${LINEAGEDIR}/kernel/xiaomi/msm8956'
+alias hydrogenlaos_v='cd ${LINEAGEDIR}/vendor/xiaomi/hydrogen'
+
+alias 8956laos_d='cd ${LINEAGEDIR}/device/xiaomi/msm8956-common'
+alias 8956laos_v='cd ${LINEAGEDIR}/vendor/xiaomi/msm8956-common'
+
+alias xiaomilaos_v='cd ${LINEAGEDIR}/vendor/xiaomi'
+
+#------------------------------------------////
+# AOSPA alias
+#------------------------------------------////
+alias sagitpa_d='cd ${PADIR}/device/xiaomi/sagit'
+alias sagitpa_k='cd ${PADIR}/kernel/xiaomi/msm8998'
+alias sagitpa_v='cd ${PADIR}/vendor/xiaomi/sagit'
+
+alias xiaomipa_v='cd ${PADIR}/vendor/xiaomi'
+alias pa_v='cd ${PADIR}/vendor/pa'
