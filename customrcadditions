@@ -23,14 +23,15 @@ nc='\e[0m'
 
 if [[ "$(mount | grep work)" ]]; then
     WORKDIR="/work";
-    LINEAGEDIR="/work/Android/lineage";
-    PADIR="/work/Android/pa";
+    ANDROIDWORKDIR="/work/Android";
 
-    export PATH=${WORKDIR}/bin:${WORKDIR}/Android/Sdk/platform-tools:$PATH
+    export PATH=${WORKDIR}/bin:${ANDROIDWORKDIR}/Sdk/platform-tools:$PATH
 else
-    LINEAGEDIR="${HOME}/lineage";
-    PADIR="${HOME}/pa";
+	ANDROIDWORKDIR="${HOME}";
 fi
+LINEAGEDIR="${ANDROIDWORKDIR}/lineage";
+PADIR="${ANDROIDWORKDIR}/pa";
+SUPERRDIR="${ANDROIDWORKDIR}/superr";
 
 function upinfo ()
 {
@@ -58,7 +59,7 @@ export USE_CCACHE=1
 export ANDROID_JACK_VM_ARGS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4G"
 
 #------------------------------------------////
-# System Alias:
+# System Aliases
 #------------------------------------------////
 alias shutdown='sudo shutdown -P now'
 alias gtcp='git cherry-pick'
@@ -74,6 +75,9 @@ alias makekernel='make ARCH=arm64 CROSS_COMPILE="${LINEAGEDIR}/prebuilts/gcc/lin
 alias makeoutkernel='make O=../out ARCH=arm64 CROSS_COMPILE="${LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
 alias laos='cd ${LINEAGEDIR}'
 alias pa='cd ${PADIR}'
+alias superr='cd ${SUPERRDIR} && bash superr'
+alias jadx='bash ${ANDROIDWORKDIR}/jadx/build/jadx/bin/jadx-gui'
+alias jadx_cli='bash ${ANDROIDWORKDIR}/jadx/build/jadx/bin/jadx'
 
 if [[ -f ${PADIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump ]]; then
 	alias objdump_aarch64='${PADIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump'
@@ -85,8 +89,11 @@ fi
 
 
 #------------------------------------------////
-# LAOS alias
+# cd-into aliases
 #------------------------------------------////
+alias dotfiles='cd ~/.dotfiles'
+
+# LAOS
 alias sagitlaos_d='cd ${LINEAGEDIR}/device/xiaomi/sagit'
 alias sagitlaod_k='cd ${LINEAGEDIR}/kernel/xiaomi/msm8998'
 alias sagitloas_v='cd ${LINEAGEDIR}/vendor/xiaomi/sagit'
@@ -104,12 +111,16 @@ alias 8956laos_v='cd ${LINEAGEDIR}/vendor/xiaomi/msm8956-common'
 
 alias xiaomilaos_v='cd ${LINEAGEDIR}/vendor/xiaomi'
 
-#------------------------------------------////
-# AOSPA alias
-#------------------------------------------////
+# AOSPA
 alias sagitpa_d='cd ${PADIR}/device/xiaomi/sagit'
 alias sagitpa_k='cd ${PADIR}/kernel/xiaomi/msm8998'
 alias sagitpa_v='cd ${PADIR}/vendor/xiaomi/sagit'
 
 alias xiaomipa_v='cd ${PADIR}/vendor/xiaomi'
 alias pa_v='cd ${PADIR}/vendor/pa'
+
+# Misc
+alias superr_cd='cd ${SUPERRDIR}'
+alias superr_sagit='cd ${SUPERRDIR}/superr_sagit'
+alias superr_kenzo='cd ${SUPERRDIR}/superr_kenzo'
+alias superr_hydrogen='cd ${SUPERRDIR}/superr_hydrogen' 
