@@ -450,7 +450,7 @@ fi
 TIME_END=$(date +%s.%N)
 
 # Kill jack server
-. $CURDIR/prebuilts/sdk/tools/jack-admin kill-server
+prebuilts/sdk/tools/jack-admin kill-server
 
 if [[ "$UPLOAD" = "true" ]]; then
   if [[ "$CURDIR" = "lineage" ]]; then
