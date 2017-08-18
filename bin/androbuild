@@ -398,9 +398,6 @@ if [ "$CCACHE" = "true" ]; then
   fi
 fi
 
-# Build start time
-TIME_START=$(date +%s.%N)
-
 source build/envsetup.sh
 if [[ "$CURDIR" = "lineage" ]]; then
 lunch lineage_$TARGET-$VARIANT
@@ -446,9 +443,6 @@ else
     build_android "$CMD"
 fi
 
-# Build complete time
-TIME_END=$(date +%s.%N)
-
 # Kill jack server
 prebuilts/sdk/tools/jack-admin kill-server
 
@@ -479,8 +473,4 @@ if [[ "$RELEASE" = "true" ]]; then
     echo -e "${yellow}Upload configured only for LineageOS${nc}"
   fi
 fi
-echo -e ""
-
-# Calculate and display time
-echo -e "${yellow}Total time elapsed:${nc} ${green}$(echo "($TIME_END - $TIME_START) / 60" | bc) minutes ($(echo "$TIME_END - $TIME_START" | bc) seconds)${nc}"
 echo -e ""
