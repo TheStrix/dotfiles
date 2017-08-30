@@ -130,6 +130,7 @@ if [ "$DMESG" = "true" ]; then
 	else
 		DMFILE=$DIR/dm.txt
 	fi
+	adb root && adb wait-for-device remount
 	adb shell dmesg > $DMFILE
 fi
 
