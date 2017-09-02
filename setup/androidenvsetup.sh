@@ -77,9 +77,9 @@ curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
 chmod a+x ~/bin/repo
 
 echo -e "${yellow}Setting up dotfiles${nc}"
-cd ~/.dotfiles/
+cd ~/.dotfiles/setup
 ./setupdotfiles
-
+cd
 
 echo -ne "${yellow}Do you wish to source new bashrcadditions (y/n)?${nc}"
 read answer

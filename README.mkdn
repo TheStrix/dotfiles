@@ -1,4 +1,4 @@
-TheStrix Dot-Files
+Dot-Files
 =====================
  
 Clone the repo recursively
@@ -6,3 +6,5 @@ Clone the repo recursively
 ```bash
  git clone --recursive git@github.com:TheStrix/dotfiles.git .dotfiles
 ```
+
+Just a bunch of scripts I use everyday :)

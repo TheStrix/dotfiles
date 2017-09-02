@@ -7,4 +7,4 @@ for f in ~/.bashrc; do
 done
 
 echo "Copying $HOME/.dotfiles/bin/ to $HOME/bin/."
-cp -R bin/* $HOME/bin/.
+cp -R $HOME/.dotfiles/bin/* $HOME/bin/.
