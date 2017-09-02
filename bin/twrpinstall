@@ -1,0 +1,114 @@
+#!/bin/bash
+#
+# Copyright (C) 2017. Parth Bhatia (TheStrix) <parthbhatia98@gmail.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# COLORS
+yellow='\e[1;33m'
+nc='\e[0m'
+
+usage() {
+	cat <<USAGE
+Usage:
+		bash $0 <ZIP_NAME/S> [OPTIONS]
+
+Examples:		twrpinstall rom.zip gapps.zip -dlcs
+		BTS: Will first wipe the partitions specified. Then will push rom.zip to tmpfs and install.
+		Will remove *.zip from tmpfs, push gapps.zip and install it. (Why? Because tmpfs storage is limited)
+
+OPTIONS:
+	-h, --help
+		Display this help message.
+
+	-d, --wipedata
+		Wipe data.
+
+	-c, --wipecache
+		Wipe cache.
+
+	-l, --wipedalvik
+		Wipe dalvik cache.
+
+	-s, --wipesystem
+		Wipe system.
+
+USAGE
+}
+
+# Setup getopt.
+long_opts="help,wipedata,wipecache,wipedalvik,wipesystem"
+getopt_cmd=$(getopt -o hdcls --long "$long_opts" \
+            -n $(basename $0) -- "$@") || \
+            { echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
+
+eval set -- "$getopt_cmd"
+
+while true; do
+    case "$1" in
+        -h|--help) usage; exit 0;;
+        -d|--wipedata) WIPEDATA="true";;
+		-c|--wipecache) WIPECACHE="true";;
+		-l|--wipedalvik) WIPEDALVIK="true";;
+		-s|--wipesystem) WIPESYSTEM="true";;
+        --) shift; break;;
+    esac
+    shift
+done
+
+# Mandatory argument
+if [ $# -eq 0 ]; then
+    echo -e "${red}\nERROR: Missing mandatory argument: ZIP_NAME\n${nc}"
+    usage
+    exit 1
+fi
+
+if [[ $(adb devices | tail -2 | head -1 | cut -f 2 | sed 's/ *$//g') != "recovery" ]]; then
+	adb reboot recovery
+fi
+
+while [[ $(adb devices | tail -2 | head -1 | cut -f 2 | sed 's/ *$//g') != "recovery" ]]; do
+	sleep 2
+done
+
+if [[ "$WIPEDATA" = "true" ]]; then
+	adb shell twrp wipe data;
+fi
+
+if [[ "$WIPECACHE" = "true" ]]; then
+	adb shell twrp wipe cache;
+fi
+
+if [[ "$WIPEDALVIK" = "true" ]]; then
+	adb shell twrp wipe dalvik;
+fi
+
+if [[ "$WIPESYSTEM" = "true" ]]; then
+	adb shell twrp wipe system;
+fi
+
+for l in $@; do
+    adb shell rm -rf /tmp/*.zip
+    adb push $l /tmp/
+    adb shell twrp install /tmp/$(basename $l)
+    adb shell rm -rf /tmp/*.zip
+done
+
+echo -e "${yellow}Do you want to reboot to system? Y/N${nc}"
+read choice
+if [[ $choice = "y" || $choice = "Y" ]]; then
+	adb reboot
+else
+	exit 1
+fi
