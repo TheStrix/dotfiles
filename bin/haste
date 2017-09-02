@@ -4,7 +4,6 @@ echo -e "${lightgreen}1. hastebin.com\t 2. haste.akhilnarang.me${nc}"
 read choice
 if [[ $choice = "1" ]]; then
 	curl -X POST -s -T $1 https://hastebin.com/documents | awk -F '"' '{print "https://hastebin.com/"$4}';
-	#curl -X POST -s -T $1 http://haste.akhilnarang.me/documents | awk -F '"' '{print "http://haste.akhilnarang.me/"$4}';
 elif [[ $choice = "2" ]]; then
 	curl -X POST -s -T $1 http://haste.akhilnarang.me/documents | awk -F '"' '{print "http://haste.akhilnarang.me/"$4}';
 fi
