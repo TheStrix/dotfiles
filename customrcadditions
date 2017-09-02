@@ -87,7 +87,7 @@ fi
 
 # ADB
 alias adbrem='adb root && adb wait-for-device remount'
-alias adbs='adbrrem && adb shell'
+alias adbs='adbrem && adb shell'
 alias adbgp='adb shell getprop'
 alias adbr='adb reboot'
 alias adbpo='adb shell reboot -p'
