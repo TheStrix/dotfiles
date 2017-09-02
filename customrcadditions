@@ -86,7 +86,7 @@ else
 fi
 
 # ADB
-alias adbrem='adb root && adb wait-for-device remount'
+function adbrem() { adb root && adb wait-for-$(adb devices | tail -2 | head -1 | cut -f 2 | sed 's/ *$//g') remount }
 alias adbs='adbrem && adb shell'
 alias adbgp='adb shell getprop'
 alias adbr='adb reboot'
