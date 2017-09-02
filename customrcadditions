@@ -73,8 +73,6 @@ alias path='echo ${PATH}'
 alias android-studio='sh /opt/android-studio/bin/studio.sh'
 alias makekernel='make ARCH=arm64 CROSS_COMPILE="${LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
 alias makeoutkernel='make O=../out ARCH=arm64 CROSS_COMPILE="${LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
-alias laos='cd ${LINEAGEDIR}'
-alias pa='cd ${PADIR}'
 alias superr='cd ${SUPERRDIR} && bash superr'
 alias jadx='bash ${ANDROIDWORKDIR}/jadx/build/jadx/bin/jadx-gui'
 alias jadx_cli='bash ${ANDROIDWORKDIR}/jadx/build/jadx/bin/jadx'
@@ -87,11 +85,24 @@ else
 	alias objdump_aarch64='echo -e "${lightred}objdump file path not found!\nMake sure you have LAOS/PA source code syned.\nCheck custombashrc for more.${nc}"'
 fi
 
+# ADB
+alias adbrem='adb root && adb wait-for-device remount'
+alias adbs='adbrrem && adb shell'
+alias adbgp='adb shell getprop'
+alias adbr='adb reboot'
+alias adbpo='adb shell reboot -p'
+alias adbrb='adb reboot bootloader'
+alias adbrr='adb reboot recovery'
+alias adbservice='adb shell service list'
+alias adbdumpsys='adb shell dumpsys'
+alias adbstrace='adb shell strace'
 
 #------------------------------------------////
 # cd-into aliases
 #------------------------------------------////
 alias dotfiles='cd ~/.dotfiles'
+alias laos='cd ${LINEAGEDIR}'
+alias pa='cd ${PADIR}'
 
 # LAOS
 alias sagitlaos_d='cd ${LINEAGEDIR}/device/xiaomi/sagit'
