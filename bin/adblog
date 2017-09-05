@@ -116,8 +116,11 @@ if [ "$LOGCAT" = "true" ]; then
 		LOGCFILE=$DIR/log.txt
 	fi
 	if [[ "$LC" = "true" ]]; then
-		adb shell logcat > $LOGCFILE
+		while [[ $(adb devices | tail -2 | head -1 | cut -f 2 | sed 's/ *$//g') != "device" ]]; do
+			sleep 0.8
+		done
 		echo -e "${yellow}Logcat started...${nc}"
+		adb shell logcat > $LOGCFILE
 	else
 		adb shell logcat -d > $LOGCFILE
 	fi
