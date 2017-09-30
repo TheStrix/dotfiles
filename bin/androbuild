@@ -443,9 +443,11 @@ else
     build_android "$CMD"
 fi
 
-# Kill jack server
+# Cleanup
 prebuilts/sdk/tools/jack-admin kill-server
+run_cleanrambuild.sh
 
+# Upload to GDrive / AFH
 if [[ "$UPLOAD" = "true" ]]; then
   if [[ "$CURDIR" = "lineage" ]]; then
     if [[ "$TARGET" = "kenzo" ]]; then

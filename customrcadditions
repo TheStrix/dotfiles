@@ -42,8 +42,7 @@ echo -ne "${yellow}$(hostname) ${lightred}uptime is ${lightblue} \t ";uptime | a
 # System Information:
 #------------------------------------------////
 clear
-echo -e "${LIGHTGRAY}";figlet "TheStrix";
-echo ""
+if [[ $(command -v figlet) ]]; then echo -e "${LIGHTGRAY}";figlet "TheStrix"; fi
 echo -ne "${lightred}Today is:\t\t${lightblue}" `date`; echo ""
 echo -e "${lightred}Kernel Information: \t${lightblue}" `uname -smr`
 echo -ne "${cyan}";upinfo;echo ""
@@ -57,6 +56,12 @@ export KBUILD_BUILD_USER=ParthB
 export USE_CCACHE=1
 # Jack is the new Java compiler used from Android 7. It is known to run out of memory - a simple fix is to run this command:
 export ANDROID_JACK_VM_ARGS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4G"
+export PATH=~/bin:$PATH
+
+if [[ $HOSTNAME = "build2.dev.xda-developers.com" ]]; then
+	export PATH=~/install/java/bin:$PATH
+	export JAVA_HOME=~/install/java
+fi
 
 #------------------------------------------////
 # System Aliases
