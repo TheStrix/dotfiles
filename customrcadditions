@@ -61,6 +61,8 @@ export PATH=~/bin:$PATH
 if [[ $HOSTNAME = "build2.dev.xda-developers.com" ]]; then
 	export PATH=~/install/java/bin:~/install/zsh/bin:$PATH
 	export JAVA_HOME=~/install/java
+	export SHELL=`which zsh`
+	[ -z "$ZSH_VERSION" ] && exec "$SHELL" -l
 fi
 
 #------------------------------------------////
