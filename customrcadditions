@@ -32,6 +32,7 @@ fi
 LINEAGEDIR="${ANDROIDWORKDIR}/lineage";
 PADIR="${ANDROIDWORKDIR}/pa";
 SUPERRDIR="${ANDROIDWORKDIR}/superr";
+MIDEVDIR="${ANDROIDWORKDIR}/xiaomi-dev";
 
 function upinfo ()
 {
@@ -45,7 +46,7 @@ clear
 if [[ $(command -v figlet) ]]; then echo -e "${LIGHTGRAY}";figlet "TheStrix"; fi
 echo -ne "${lightred}Today is:\t\t${lightblue}" `date`; echo ""
 echo -e "${lightred}Kernel Information: \t${lightblue}" `uname -smr`
-echo -ne "${cyan}";upinfo;echo ""
+echo -ne "${cyan}";upinfo;echo -e "${nc}"
 
 #------------------------------------------///
 # EXPORTS:
