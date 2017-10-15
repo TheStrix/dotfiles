@@ -150,7 +150,7 @@ echo -e "${lightgreen}Completed, diff stored at $DIFFDIR/system_${OLD_MIUI_VERSI
 
 # Create boot.diff
 echo -e "${lightblue}Comparing two boot.\nOLD: ${OLD_SUPERR_DIR}_old/bootimg\nNEW: $OLD_SUPERR_DIR/bootimg${nc}"
-diff -bur ${OLD_SUPERR_DIR}_old/system $OLD_SUPERR_DIR/system > $DIFFDIR/boot_${OLD_MIUI_VERSION}-${NEW_MIUI_VERSION}.diff
+diff -bur ${OLD_SUPERR_DIR}_old/bootimg $OLD_SUPERR_DIR/bootimg > $DIFFDIR/boot_${OLD_MIUI_VERSION}-${NEW_MIUI_VERSION}.diff
 echo -e "${lightgreen}Completed, diff stored at $DIFFDIR/boot_${OLD_MIUI_VERSION}-${NEW_MIUI_VERSION}.diff\n${nc}"
 
 echo -e "${yellow}Do you want to delete old superr dump? Y/N${nc}"
