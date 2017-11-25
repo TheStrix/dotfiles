@@ -103,6 +103,7 @@ alias adbdumpsys='adb shell dumpsys'
 alias adbstrace='adb shell strace'
 
 # git
+alias git='hub'
 alias gtcp='git cherry-pick'
 alias grev='git revert'
 alias glog='git log --pretty=format:"%h - %an : %s"'

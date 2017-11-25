@@ -3,3 +3,7 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 ZSH_THEME="miloshadzic"
 plugins=(adb zsh-autosuggestions)
+
+# Hub
+fpath=(~/.zsh/completions $fpath)
+autoload -U compinit && compinit
