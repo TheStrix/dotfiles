@@ -50,6 +50,11 @@ nc='\e[0m'
 
 #set -o errexit
 
+# Switch to python2 for android build if the file exists
+if [[ -e $HOME/android/venv/bin/activate ]]; then
+  . $HOME/android/venv/bin/activate
+fi
+
 usage() {
 cat <<USAGE
 
