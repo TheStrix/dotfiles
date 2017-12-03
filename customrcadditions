@@ -68,7 +68,7 @@ if [[ $HOSTNAME = "build2.dev.xda-developers.com" ]]; then
 fi
 
 #------------------------------------------////
-# System Aliases
+# System Aliases/Functions
 #------------------------------------------////
 alias shutdown='sudo shutdown -P now'
 alias yufastboot='fastboot -i 0x2A96'
@@ -103,6 +103,13 @@ alias adbrr='adb reboot recovery'
 alias adbservice='adb shell service list'
 alias adbdumpsys='adb shell dumpsys'
 alias adbstrace='adb shell strace'
+
+# Fastboot
+alias fbdev='fastboot devices'
+alias fbr='fastboot reboot'
+alias fbboot='fastboot boot'
+alias fbflboot='fastboot flash boot'
+alias fbflrec='fastboot flash recovery'
 
 # git
 alias git='hub'
@@ -150,3 +157,11 @@ alias superr_cd='cd ${SUPERRDIR}'
 alias superr_sagit='cd ${SUPERRDIR}/superr_sagit'
 alias superr_kenzo='cd ${SUPERRDIR}/superr_kenzo'
 alias superr_hydrogen='cd ${SUPERRDIR}/superr_hydrogen' 
+
+#------------------------------------------////
+# Distro Specific Aliases/Functions
+#------------------------------------------////
+
+# Arch-Deepin
+# Mouted at: /run/user/$UID/gvfs/mtp*
+function mtp-mount-gio() { gio mount -li | awk -F= '{if(index($2,"mtp") == 1)system("gio mount "$2)}'; }

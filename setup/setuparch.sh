@@ -17,11 +17,35 @@ gpg --recv-keys 702353E0F7E48EDB
 # Install aosp-devel (and lineageos-devel because quite a few probably build Lineage/Lineage based ROMs as well.
 pacaur -S aosp-devel lineageos-devel --noconfirm
 # Just a couple of other useful tools I use, others do too probably
-pacaur -S hub neofetch fortune-mod --noconfirm
+pacaur -S hub neofetch fortune-mod figlet --noconfirm
 
 echo "All Done :'D"
 echo "Don't forget to run these commands before building, or make sure the python in your PATH is python2 and not python3"
 echo "
-virtualenv2 venv
-source venv/bin/activate
-export LC_ALL=C"
+virtualenv2 venv"
+
+# ADB ports setup
+if [ ! "$(which adb)" == "" ];
+then
+echo -e "${yellow}Setting up USB Ports${nc}"
+sudo curl --create-dirs -L -o /etc/udev/rules.d/51-android.rules -O -L https://raw.githubusercontent.com/snowdream/51-android/master/51-android.rules
+sudo chmod 644   /etc/udev/rules.d/51-android.rules
+sudo chown root /etc/udev/rules.d/51-android.rules
+sudo udevadm control --reload-rules
+adb kill-server
+sudo killall adb
+fi
+
+# Setup dotfiles
+echo -e "${yellow}Setting up dotfiles${nc}"
+mkdir ~/bin
+PATH=~/bin:$PATH
+. $HOME/.dotfiles/setup/setupdotfiles.sh
+
+echo -ne "${yellow}Do you wish to source new bashrcadditions (y/n)?${nc}"
+read answer
+if echo -e "$answer" | grep -iq "^y" ;then
+    source ~/.dotfiles/customrcadditions
+else
+    echo
+fi
