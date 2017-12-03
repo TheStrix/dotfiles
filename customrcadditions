@@ -21,18 +21,19 @@ yellow='\e[1;33m'
 white='\e[1;37m'
 nc='\e[0m'
 
+# Custom dir exports
 if [[ "$(mount | grep work)" ]]; then
-    WORKDIR="/work";
-    ANDROIDWORKDIR="/work/Android";
+    export C_WORKDIR="/work";
+    export C_ANDROIDWORKDIR="/work/Android";
 
-    export PATH=${WORKDIR}/bin:${ANDROIDWORKDIR}/Sdk/platform-tools:$PATH
+    export PATH=${C_WORKDIR}/bin:${C_ANDROIDWORKDIR}/Sdk/platform-tools:$PATH
 else
-	ANDROIDWORKDIR="${HOME}";
+	export C_ANDROIDWORKDIR="${HOME}";
 fi
-LINEAGEDIR="${ANDROIDWORKDIR}/lineage";
-PADIR="${ANDROIDWORKDIR}/pa";
-SUPERRDIR="${ANDROIDWORKDIR}/superr";
-MIDEVDIR="${ANDROIDWORKDIR}/xiaomi-dev";
+export C_LINEAGEDIR="${C_ANDROIDWORKDIR}/lineage";
+export C_PADIR="${C_ANDROIDWORKDIR}/pa";
+export C_SUPERRDIR="${C_ANDROIDWORKDIR}/superr";
+export C_MIDEVDIR="${C_ANDROIDWORKDIR}/xiaomi-dev";
 
 function upinfo ()
 {
@@ -77,17 +78,17 @@ alias setperf='echo "performance" | sudo tee /sys/devices/system/cpu/cpu*/cpufre
 alias setsave='echo "powersave" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor'
 alias path='echo ${PATH}'
 alias android-studio='sh /opt/android-studio/bin/studio.sh'
-alias makekernel='make ARCH=arm64 CROSS_COMPILE="${LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
-alias makeoutkernel='make O=../out ARCH=arm64 CROSS_COMPILE="${LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
-alias superr='cd ${SUPERRDIR} && bash superr'
-alias jadx='bash ${ANDROIDWORKDIR}/jadx/build/jadx/bin/jadx-gui'
-alias jadx_cli='bash ${ANDROIDWORKDIR}/jadx/build/jadx/bin/jadx'
+alias makekernel='make ARCH=arm64 CROSS_COMPILE="${C_LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
+alias makeoutkernel='make O=../out ARCH=arm64 CROSS_COMPILE="${C_LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
+alias superr='cd ${C_SUPERRDIR} && bash superr'
+alias jadx='bash ${C_ANDROIDWORKDIR}/jadx/build/jadx/bin/jadx-gui'
+alias jadx_cli='bash ${C_ANDROIDWORKDIR}/jadx/build/jadx/bin/jadx'
 alias venv=". $HOME/android/venv/bin/activate"
 
-if [[ -f ${PADIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump ]]; then
-	alias objdump_aarch64='${PADIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump'
-elif [[ -f ${LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump ]]; then
-	alias objdump_aarch64='${LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump'
+if [[ -f ${C_PADIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump ]]; then
+	alias objdump_aarch64='${C_PADIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump'
+elif [[ -f ${C_LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump ]]; then
+	alias objdump_aarch64='${C_LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump'
 else
 	alias objdump_aarch64='echo -e "${lightred}objdump file path not found!\nMake sure you have LAOS/PA source code syned.\nCheck custombashrc for more.${nc}"'
 fi
@@ -123,40 +124,40 @@ alias gcomlaos='git commit --author="TheStrix <parthbhatia@lineageos.org>"'
 # cd-into aliases
 #------------------------------------------////
 alias dotfiles='cd ~/.dotfiles'
-alias laos='cd ${LINEAGEDIR}'
-alias pa='cd ${PADIR}'
+alias laos='cd ${C_LINEAGEDIR}'
+alias pa='cd ${C_PADIR}'
 
 # LAOS
-alias sagitlaos_d='cd ${LINEAGEDIR}/device/xiaomi/sagit'
-alias sagitlaod_k='cd ${LINEAGEDIR}/kernel/xiaomi/msm8998'
-alias sagitloas_v='cd ${LINEAGEDIR}/vendor/xiaomi/sagit'
+alias sagitlaos_d='cd ${C_LINEAGEDIR}/device/xiaomi/sagit'
+alias sagitlaod_k='cd ${C_LINEAGEDIR}/kernel/xiaomi/msm8998'
+alias sagitloas_v='cd ${C_LINEAGEDIR}/vendor/xiaomi/sagit'
 
-alias kenzolaos_d='cd ${LINEAGEDIR}/device/xiaomi/kenzo'
-alias kenzolaos_k='cd ${LINEAGEDIR}/kernel/xiaomi/msm8956'
-alias kenzolaos_v='cd ${LINEAGEDIR}/vendor/xiaomi/kenzo'
+alias kenzolaos_d='cd ${C_LINEAGEDIR}/device/xiaomi/kenzo'
+alias kenzolaos_k='cd ${C_LINEAGEDIR}/kernel/xiaomi/msm8956'
+alias kenzolaos_v='cd ${C_LINEAGEDIR}/vendor/xiaomi/kenzo'
 
-alias hydrogenlaos_d='cd ${LINEAGEDIR}/device/xiaomi/hydrogen'
-alias hydrogenlaos_k='cd ${LINEAGEDIR}/kernel/xiaomi/msm8956'
-alias hydrogenlaos_v='cd ${LINEAGEDIR}/vendor/xiaomi/hydrogen'
+alias hydrogenlaos_d='cd ${C_LINEAGEDIR}/device/xiaomi/hydrogen'
+alias hydrogenlaos_k='cd ${C_LINEAGEDIR}/kernel/xiaomi/msm8956'
+alias hydrogenlaos_v='cd ${C_LINEAGEDIR}/vendor/xiaomi/hydrogen'
 
-alias 8956laos_d='cd ${LINEAGEDIR}/device/xiaomi/msm8956-common'
-alias 8956laos_v='cd ${LINEAGEDIR}/vendor/xiaomi/msm8956-common'
+alias 8956laos_d='cd ${C_LINEAGEDIR}/device/xiaomi/msm8956-common'
+alias 8956laos_v='cd ${C_LINEAGEDIR}/vendor/xiaomi/msm8956-common'
 
-alias xiaomilaos_v='cd ${LINEAGEDIR}/vendor/xiaomi'
+alias xiaomilaos_v='cd ${C_LINEAGEDIR}/vendor/xiaomi'
 
 # AOSPA
-alias sagitpa_d='cd ${PADIR}/device/xiaomi/sagit'
-alias sagitpa_k='cd ${PADIR}/kernel/xiaomi/msm8998'
-alias sagitpa_v='cd ${PADIR}/vendor/xiaomi/sagit'
+alias sagitpa_d='cd ${C_PADIR}/device/xiaomi/sagit'
+alias sagitpa_k='cd ${C_PADIR}/kernel/xiaomi/msm8998'
+alias sagitpa_v='cd ${C_PADIR}/vendor/xiaomi/sagit'
 
-alias xiaomipa_v='cd ${PADIR}/vendor/xiaomi'
-alias pa_v='cd ${PADIR}/vendor/pa'
+alias xiaomipa_v='cd ${C_PADIR}/vendor/xiaomi'
+alias pa_v='cd ${C_PADIR}/vendor/pa'
 
 # Misc
-alias superr_cd='cd ${SUPERRDIR}'
-alias superr_sagit='cd ${SUPERRDIR}/superr_sagit'
-alias superr_kenzo='cd ${SUPERRDIR}/superr_kenzo'
-alias superr_hydrogen='cd ${SUPERRDIR}/superr_hydrogen' 
+alias superr_cd='cd ${C_SUPERRDIR}'
+alias superr_sagit='cd ${C_SUPERRDIR}/superr_sagit'
+alias superr_kenzo='cd ${C_SUPERRDIR}/superr_kenzo'
+alias superr_hydrogen='cd ${C_SUPERRDIR}/superr_hydrogen' 
 
 #------------------------------------------////
 # Distro Specific Aliases/Functions

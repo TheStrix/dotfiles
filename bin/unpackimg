@@ -1,0 +1,59 @@
+#!/bin/bash
+
+usage() {
+	cat <<USAGE
+
+Usage:
+		bash $0 <IMAGE_FILE> <OUTPUT_DIR> [OPTIONS]
+
+Examples: 	adbcon boot.img bootimg
+
+OPTIONS:
+	-h, --help
+		Display this help message
+
+USAGE
+}
+
+# Setup getopt.
+long_opts="help"
+getopt_cmd=$(getopt -o h --long "$long_opts" \
+            -n $(basename $0) -- "$@") || \
+            { echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
+
+eval set -- "$getopt_cmd"
+
+while true; do
+    case "$1" in
+        -h|--help) usage; exit 0;;
+        --) shift; break;;
+    esac
+    shift
+done
+
+# Mandatory argument
+if [ $# -eq 0 ]; then
+    echo -e "\nERROR: Missing mandatory argument: IMAGE_FILE\n"
+    usage
+    exit 1
+fi
+
+CURR_DIR=$(pwd);
+IMAGE_FILE=$(readlink -f "$1");
+if [[ -z $2 ]]; then
+	OUTPUT_DIR=$CURR_DIR;
+else
+	OUTPUT_DIR=$(readlink -f "$2");
+fi
+
+if [[ ! -d $OUTPUT_DIR ]]; then
+	mkdir -p $OUTPUT_DIR;
+fi
+
+# Unpack using osm0sis's script in superR tools
+bash $C_SUPERRDIR/tools/boot/AIK/unpackimg.sh $IMAGE_FILE;
+# Move unpacked stuff to chosen output dir
+mv $C_SUPERRDIR/tools/boot/AIK/ramdisk $OUTPUT_DIR;
+mv $C_SUPERRDIR/tools/boot/AIK/split_img $OUTPUT_DIR;
+
+cd $CURR_DIR

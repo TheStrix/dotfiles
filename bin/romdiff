@@ -88,7 +88,7 @@ OLD_SUPERR_DIR=$1
 NEW_ROM_FILE=$2
 
 # Append _old to dir
-cd $SUPERRDIR
+cd $C_SUPERRDIR
 mv $OLD_SUPERR_DIR ${OLD_SUPERR_DIR}_old
 
 # Make a new superr dir with the new ROM file in it
@@ -116,13 +116,13 @@ else
 fi
 
 # Launch superr and user has to manually unpack it here
-cd ${SUPERRDIR} && bash superr
+cd ${C_SUPERRDIR} && bash superr
 
 echo -e "${yellow}Deleting system.img from $OLD_SUPERR_DIR as it's extracted${nc}"
 rm $OLD_SUPERR_DIR/system.img
 
 echo -e "${lightgreen}Unpacking boot.img to 'bootimg'${nc}"
-mkboot $OLD_SUPERR_DIR/boot.img $OLD_SUPERR_DIR/bootimg
+unpackimg $OLD_SUPERR_DIR/boot.img $OLD_SUPERR_DIR/bootimg
 
 # Store MIUI versions to append if diff file names
 OLD_MIUI_VERSION=$(grep "ro.build.version.incremental" ${OLD_SUPERR_DIR}_old/system/build.prop | awk -F '=' '{print $2}')
@@ -132,7 +132,7 @@ echo -e "${lightpurple}New MIUI version: $NEW_MIUI_VERSION${nc}"
 
 # Know the diff store path
 TARGET=$(grep "ro.build.description" $OLD_SUPERR_DIR/system/build.prop | awk -F '=|-' '{print $2}')
-DIFFDIR=$MIDEVDIR/miuidiff/$TARGET
+DIFFDIR=$C_MIDEVDIR/miuidiff/$TARGET
 
 # Create dir if not present
 if [[ ! -e $DIFFDIR ]]; then
