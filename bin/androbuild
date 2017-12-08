@@ -163,6 +163,10 @@ build_bootimg() {
 
 build_recoveryimg() {
     echo -e "${yellow}\nINFO: Build recoveryimage for $TARGET\n${nc}"
+    echo -e "${lightpurple}Please enter TW_DEVICE_VERSION: ${nc}"
+    read TW_DEVICE_VERSION
+    echo -e "${lightpurple}Setting TW_DEVICE_VERSION=$TW_DEVICE_VERSION${nc}"
+    export TW_DEVICE_VERSION=$TW_DEVICE_VERSION
     if [ "$LOG" = "true" ]; then
       make recoveryimage $@ | tee $LOG_FILE.log
     else
@@ -404,13 +408,13 @@ if [ "$CCACHE" = "true" ]; then
 fi
 
 source build/envsetup.sh
-if [[ "$CURDIR" = "lineage" ]]; then
+if [[ "$CURDIR" = lineage* ]]; then
 lunch lineage_$TARGET-$VARIANT
-elif [[ "$CURDIR" = "omni" ]]; then
+elif [[ "$CURDIR" = omni* ]]; then
 lunch omni_$TARGET-$VARIANT
-elif [[ "$CURDIR" = "aicp" ]]; then
+elif [[ "$CURDIR" = aicp* ]]; then
 lunch aicp_$TARGET-$VARIANT
-elif [[ "$CURDIR" = "pa" ]]; then
+elif [[ "$CURDIR" = pa* ]]; then
 lunch pa_$TARGET-$VARIANT
 else
 lunch aosp_$TARGET-$VARIANT
@@ -434,12 +438,6 @@ if [ -n "$MODULE" ]; then
 elif [ -n "$PROJECT" ]; then
     build_project
 elif [ -n "$IMAGE" ]; then
-    if [[ "$IMAGE" == "recoveryimg" ]]; then
-      echo -e "${lightpurple}Please enter TW_DEVICE_VERSION: ${nc}"
-      read TW_DEVICE_VERSION
-      echo -e "${lightpurple}Setting TW_DEVICE_VERSION=$TW_DEVICE_VERSION${nc}"
-      export TW_DEVICE_VERSION=$TW_DEVICE_VERSION
-    fi
     build_$IMAGE "$CMD"
 elif [ -n "$AUDIT" ]; then
     echo -e "${lightblue}cat "$AUDIT" | audit2allow -p ${OUT}/root/sepolicy${nc}"
