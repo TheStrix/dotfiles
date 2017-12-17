@@ -65,8 +65,8 @@ boot_unpack() {
     bash $AIK/unpackimg.sh $IMAGE_FILE_PATH;
 
     # Move unpacked stuff to chosen output dir
-    rm -rf $OUTPUT_DIR_PATH/ramdisk $OUTPUT_DIR_PATH/split_img;
-    mv $AIK/ramdisk $OUTPUT_DIR_PATH;
+    sudo rm -rf $OUTPUT_DIR_PATH/ramdisk $OUTPUT_DIR_PATH/split_img;
+    sudo mv $AIK/ramdisk $OUTPUT_DIR_PATH;
     mv $AIK/split_img $OUTPUT_DIR_PATH;
 
     echo -e "${lightgreen}\nExtracted to $OUTPUT_DIR_PATH\n${nc}";
@@ -84,14 +84,14 @@ boot_repack() {
     fi
 
     # Move dirs to AIK for operations
-    mv $UNPACKED_IMG_DIR/ramdisk $AIK/;
+    sudo mv $UNPACKED_IMG_DIR/ramdisk $AIK/;
     mv $UNPACKED_IMG_DIR/split_img $AIK/;
 
     # Repack the image
     bash $AIK/repackimg.sh;
 
     # Move the dirs and new image back
-    mv $AIK/ramdisk $UNPACKED_IMG_DIR/;
+    sudo mv $AIK/ramdisk $UNPACKED_IMG_DIR/;
     mv $AIK/split_img $UNPACKED_IMG_DIR/;
     mv $AIK/image-new.img $OUTPUT_IMG_PATH;
 
