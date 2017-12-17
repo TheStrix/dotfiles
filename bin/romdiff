@@ -122,7 +122,7 @@ echo -e "${yellow}Deleting system.img from $OLD_SUPERR_DIR as it's extracted${nc
 rm $OLD_SUPERR_DIR/system.img
 
 echo -e "${lightgreen}Unpacking boot.img to 'bootimg'${nc}"
-unpackimg $OLD_SUPERR_DIR/boot.img $OLD_SUPERR_DIR/bootimg
+bootaik $OLD_SUPERR_DIR/boot.img $OLD_SUPERR_DIR/bootimg
 
 # Store MIUI versions to append if diff file names
 OLD_MIUI_VERSION=$(grep "ro.build.version.incremental" ${OLD_SUPERR_DIR}_old/system/build.prop | awk -F '=' '{print $2}')
@@ -150,13 +150,13 @@ echo -e "${lightgreen}Completed, diff stored at $DIFFDIR/system_${OLD_MIUI_VERSI
 
 # Create boot.diff
 echo -e "${lightblue}Comparing two boot.\nOLD: ${OLD_SUPERR_DIR}_old/bootimg\nNEW: $OLD_SUPERR_DIR/bootimg${nc}"
-diff -bur ${OLD_SUPERR_DIR}_old/bootimg $OLD_SUPERR_DIR/bootimg > $DIFFDIR/boot_${OLD_MIUI_VERSION}-${NEW_MIUI_VERSION}.diff
+sudo diff -bur ${OLD_SUPERR_DIR}_old/bootimg $OLD_SUPERR_DIR/bootimg > $DIFFDIR/boot_${OLD_MIUI_VERSION}-${NEW_MIUI_VERSION}.diff
 echo -e "${lightgreen}Completed, diff stored at $DIFFDIR/boot_${OLD_MIUI_VERSION}-${NEW_MIUI_VERSION}.diff\n${nc}"
 
 echo -e "${yellow}Do you want to delete old superr dump? Y/N${nc}"
 read choice
 if [[ $choice = "y" || $choice = "Y" ]]; then
-	rm -rf ${OLD_SUPERR_DIR}_old
+	sudo rm -rf ${OLD_SUPERR_DIR}_old
 else
 	exit 1
 fi
