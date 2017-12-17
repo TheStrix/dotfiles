@@ -73,8 +73,8 @@ boot_unpack() {
 }
 
 boot_repack() {
-    if [[ ! -d $UNPACKED_IMG_DIR ]]; then
-        echo -e "${lightred}\nERROR: Missing dir: UNPACKED_IMG_DIR\n${nc}";
+    if [[ ! -d "$UNPACKED_IMG_DIR/ramdisk" && ! -d "$UNPACKED_IMG_DIR/split_img" ]]; then
+        echo -e "${lightred}\nERROR: Missing/Incorrect bootimg dir: $UNPACKED_IMG_DIR\n${nc}";
         usage;
         exit 1;
     fi
@@ -112,9 +112,20 @@ eval set -- "$getopt_cmd"
 while true; do
     case "$1" in
         -h|--help) usage; exit 0;;
-        -u|--unpack) IMAGE_FILE_PATH=$(readlink -f "$3"); OUTPUT_DIR_PATH=$(readlink -f "$4"); boot_unpack;;
-        -r|--repack) UNPACKED_IMG_DIR=$(readlink -f "$3"); OUTPUT_IMG_PATH=$(readlink -f "$4"); boot_repack;;
-        --) shift; break;;
+        -u|--unpack) IMAGE_FILE_PATH=$(readlink -f "$3"); OUTPUT_DIR_PATH=$(readlink -f "$4"); boot_unpack; break;;
+        -r|--repack) UNPACKED_IMG_DIR=$(readlink -f "$3"); OUTPUT_IMG_PATH=$(readlink -f "$4"); boot_repack; break;;
+        --)
+        # When no of the opt is specified, auto-detect .img or boot dir presence
+        if [[ $2 == *.img ]]; then
+            IMAGE_FILE_PATH=$(readlink -f "$2");
+            OUTPUT_DIR_PATH=$(readlink -f "$3");
+            boot_unpack;
+        elif [[ -d "$2" ]]; then
+            UNPACKED_IMG_DIR=$(readlink -f "$2");
+            OUTPUT_IMG_PATH=$(readlink -f "$3");
+            boot_repack;
+        fi
+        shift; break;;
     esac
     shift
 done
