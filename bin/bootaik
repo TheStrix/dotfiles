@@ -1,0 +1,106 @@
+#!/bin/bash
+
+# Colors
+lightgreen='\e[1;32m'
+lightred='\e[1;31m'
+nc='\e[0m'
+
+usage() {
+    cat <<USAGE
+
+Usage:
+    To unpack:
+        bash $0 <IMAGE_FILE_PATH> <OUTPUT_DIR_PATH> -r
+    To repack:
+        bash $0 <UNPACKED_IMG_DIR> <OUTPUT_IMG_PATH> -u
+
+Examples:
+    $0 boot.img bootimg #Unpack boot.img to bootimg dir
+    $0 bootimg boot.img #Repack bootimg to boot.img dir
+
+OPTIONS:
+    -h, --help
+        Display this help message
+    -u, --unpack
+        Unpack img file
+    -r, --repack
+        Repack img
+
+USAGE
+}
+
+CURR_DIR=$(pwd);
+
+boot_unpack() {
+    if [[ ! -f $IMAGE_FILE_PATH ]]; then
+        echo -e "${lightred}\nERROR: Missing file: IMAGE_FILE_PATH\n${nc}";
+        usage;
+        exit 1;
+    fi
+
+    if [[ -z $OUTPUT_DIR_PATH ]]; then
+        mkdir -p $CURR_DIR/bootimg;
+        OUTPUT_DIR_PATH="$CURR_DIR/bootimg";
+    fi
+
+    if [[ ! -d $OUTPUT_DIR_PATH ]]; then
+        mkdir -p $OUTPUT_DIR_PATH;
+    fi
+
+    # Unpack using osm0sis's script in superR tools
+    bash $C_SUPERRDIR/tools/boot/AIK/unpackimg.sh $IMAGE_FILE_PATH;
+
+    # Move unpacked stuff to chosen output dir
+    rm -rf $OUTPUT_DIR_PATH/ramdisk $OUTPUT_DIR_PATH/split_img;
+    mv $C_SUPERRDIR/tools/boot/AIK/ramdisk $OUTPUT_DIR_PATH;
+    mv $C_SUPERRDIR/tools/boot/AIK/split_img $OUTPUT_DIR_PATH;
+
+    echo -e "${lightgreen}\nExtracted to $OUTPUT_DIR_PATH\n${nc}";
+}
+
+boot_repack() {
+    if [[ ! -d $UNPACKED_IMG_DIR ]]; then
+        echo -e "${lightred}\nERROR: Missing dir: UNPACKED_IMG_DIR\n${nc}";
+        usage;
+        exit 1;
+    fi
+
+    if [[ -z $OUTPUT_IMG_PATH ]]; then
+        OUTPUT_IMG_PATH="$CURR_DIR/boot_new.img";
+    fi
+
+    # Move dirs to AIK for operations
+    mv $UNPACKED_IMG_DIR/ramdisk $C_SUPERRDIR/tools/boot/AIK/;
+    mv $UNPACKED_IMG_DIR/split_img $C_SUPERRDIR/tools/boot/AIK/;
+
+    # Repack the image
+    bash $C_SUPERRDIR/tools/boot/AIK/repackimg.sh;
+
+    # Move the dirs and new image back
+    mv $C_SUPERRDIR/tools/boot/AIK/ramdisk $UNPACKED_IMG_DIR/;
+    mv $C_SUPERRDIR/tools/boot/AIK/split_img $UNPACKED_IMG_DIR/;
+    mv $C_SUPERRDIR/tools/boot/AIK/image-new.img $OUTPUT_IMG_PATH;
+
+    # Cleanup
+    bash $C_SUPERRDIR/tools/boot/AIK/cleanup.sh;
+
+    echo -e "${lightgreen}\nRepacked bootimg: $OUTPUT_IMG_PATH\n${nc}";
+}
+
+# Setup getopt.
+long_opts="help,unpack,repack;"
+getopt_cmd=$(getopt -o hur --long "$long_opts" \
+            -n $(basename $0) -- "$@") || \
+            { echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
+
+eval set -- "$getopt_cmd"
+
+while true; do
+    case "$1" in
+        -h|--help) usage; exit 0;;
+        -u|--unpack) IMAGE_FILE_PATH=$(readlink -f "$3"); OUTPUT_DIR_PATH=$(readlink -f "$4"); boot_unpack;;
+        -r|--repack) UNPACKED_IMG_DIR=$(readlink -f "$3"); OUTPUT_IMG_PATH=$(readlink -f "$4"); boot_repack;;
+        --) shift; break;;
+    esac
+    shift
+done
