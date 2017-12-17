@@ -2,6 +2,7 @@
 
 # Colors
 lightgreen='\e[1;32m'
+lightcyan='\e[1;36m'
 lightred='\e[1;31m'
 nc='\e[0m'
 
@@ -29,6 +30,19 @@ OPTIONS:
 USAGE
 }
 
+# osm0sis's AIK path
+if [[ -d $C_SUPERRDIR/tools/boot/AIK ]]; then
+    AIK=$C_SUPERRDIR/tools/boot/AIK;
+    echo -e "${lightcyan}\n Found AIK at $AIK\n${nc}";
+elif [[ -d $C_ANDROIDWORKDIR/AIK ]]; then
+    AIK=$C_ANDROIDWORKDIR/AIK;
+    echo -e "${lightcyan}\n Found AIK at $AIK\n${nc}";
+else
+    echo -e "${lightred}\n ERROR: AIK not found!\n${nc}";
+    echo -e "${lightred}\n Clone 'https://github.com/osm0sis/Android-Image-Kitchen/tree/AIK-Linux' to the correct path\n${nc}";
+    exit 1;
+fi
+
 CURR_DIR=$(pwd);
 
 boot_unpack() {
@@ -47,13 +61,13 @@ boot_unpack() {
         mkdir -p $OUTPUT_DIR_PATH;
     fi
 
-    # Unpack using osm0sis's script in superR tools
-    bash $C_SUPERRDIR/tools/boot/AIK/unpackimg.sh $IMAGE_FILE_PATH;
+    # Unpack
+    bash $AIK/unpackimg.sh $IMAGE_FILE_PATH;
 
     # Move unpacked stuff to chosen output dir
     rm -rf $OUTPUT_DIR_PATH/ramdisk $OUTPUT_DIR_PATH/split_img;
-    mv $C_SUPERRDIR/tools/boot/AIK/ramdisk $OUTPUT_DIR_PATH;
-    mv $C_SUPERRDIR/tools/boot/AIK/split_img $OUTPUT_DIR_PATH;
+    mv $AIK/ramdisk $OUTPUT_DIR_PATH;
+    mv $AIK/split_img $OUTPUT_DIR_PATH;
 
     echo -e "${lightgreen}\nExtracted to $OUTPUT_DIR_PATH\n${nc}";
 }
@@ -70,19 +84,19 @@ boot_repack() {
     fi
 
     # Move dirs to AIK for operations
-    mv $UNPACKED_IMG_DIR/ramdisk $C_SUPERRDIR/tools/boot/AIK/;
-    mv $UNPACKED_IMG_DIR/split_img $C_SUPERRDIR/tools/boot/AIK/;
+    mv $UNPACKED_IMG_DIR/ramdisk $AIK/;
+    mv $UNPACKED_IMG_DIR/split_img $AIK/;
 
     # Repack the image
-    bash $C_SUPERRDIR/tools/boot/AIK/repackimg.sh;
+    bash $AIK/repackimg.sh;
 
     # Move the dirs and new image back
-    mv $C_SUPERRDIR/tools/boot/AIK/ramdisk $UNPACKED_IMG_DIR/;
-    mv $C_SUPERRDIR/tools/boot/AIK/split_img $UNPACKED_IMG_DIR/;
-    mv $C_SUPERRDIR/tools/boot/AIK/image-new.img $OUTPUT_IMG_PATH;
+    mv $AIK/ramdisk $UNPACKED_IMG_DIR/;
+    mv $AIK/split_img $UNPACKED_IMG_DIR/;
+    mv $AIK/image-new.img $OUTPUT_IMG_PATH;
 
     # Cleanup
-    bash $C_SUPERRDIR/tools/boot/AIK/cleanup.sh;
+    bash $AIK/cleanup.sh;
 
     echo -e "${lightgreen}\nRepacked bootimg: $OUTPUT_IMG_PATH\n${nc}";
 }
