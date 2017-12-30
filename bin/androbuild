@@ -446,8 +446,10 @@ else
     build_android "$CMD"
 fi
 
-# Cleanup
-prebuilts/sdk/tools/jack-admin kill-server
+# Kill jack if still running
+if [[ -z $(prebuilts/sdk/tools/jack-admin list-server) ]]; then
+	prebuilts/sdk/tools/jack-admin kill-server
+fi
 
 # Upload to GDrive / AFH
 if [[ "$UPLOAD" = "true" ]]; then
