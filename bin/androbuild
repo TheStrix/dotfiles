@@ -453,7 +453,7 @@ fi
 
 # Upload to GDrive / AFH
 if [[ "$UPLOAD" = "true" ]]; then
-  if [[ "$CURDIR" = "lineage" ]]; then
+  if [[ "$CURDIR" = lineage* ]]; then
     if [[ "$TARGET" = "kenzo" ]]; then
       echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
       gdrive upload --parent 0B9JxQ_RHblHkZWpaejlPNUtjVEk ${OUT}/lineage-*.zip
@@ -467,13 +467,21 @@ if [[ "$UPLOAD" = "true" ]]; then
       echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
       gdrive upload ${OUT}/lineage-*.zip
     fi
+  elif [[ "$CURDIR" = pa* ]]; then
+    if [[ "$TARGET" = "sagit" ]]; then
+      echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
+      gdrive upload --parent 0B9JxQ_RHblHkZHV1aFpxNUhzOUU ${OUT}/pa_*.zip
+    else
+      echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
+      gdrive upload ${OUT}/pa_*.zip
+    fi
   else
-    echo -e "${yellow}Upload configured only for LineageOS${nc}"
+    echo -e "${yellow}Upload configured only for LineageOS & PA${nc}"
   fi
 fi
 
 if [[ "$RELEASE" = "true" ]]; then
-  if [[ "$CURDIR" = "lineage" ]]; then
+  if [[ "$CURDIR" = lineage* ]]; then
     afh ${OUT}/lineage-*.zip
   else
     echo -e "${yellow}Upload configured only for LineageOS${nc}"
