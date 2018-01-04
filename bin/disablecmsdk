@@ -1,4 +1,0 @@
-#!/bin/bash
-
-export I_WANT_A_QUAIL_STAR=true
-export TARGET_DISABLE_CMSDK=true

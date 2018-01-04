@@ -1,30 +1,81 @@
 #!/bin/bash
 
+# REQUIREMENT: cd into $ROM_DUMP/system & then proceed
+
+# COLORS
+lightgray='\e[0;37m'
+darkgray='\e[1;30m'
+lightblue='\e[1;34m'
+lightgreen='\e[1;32m'
+lightcyan='\e[1;36m'
+lightred='\e[1;31m'
+lightpurple='\e[1;35m'
+yellow='\e[1;33m'
+white='\e[1;37m'
+nc='\e[0m'
+
+# Make temp work dir
+TMPDIR=$(mktemp -d)
+mkdir $TMPDIR/dexout
+
 if [ "$#" -lt 1 ]; then
     echo "You have to specify at least one app to deodex"
     exit 1
 fi
 
+# Detect arch
 if [ -d framework/arm64 ]; then
     device_arch=arm64
 else
     device_arch=arm
 fi
 
-if [[ ! -d framework/$device_arch/odex && ! -d framework/$device_arch/dex ]]; then
-    oat2dex boot framework/$device_arch/boot.oat
+# Check for binaries
+if [[ -f $C_PADIR/vendor/blobscript/smali/baksmali.jar && -f $C_PADIR/vendor/blobscript/smali/smali.jar ]]; then
+    export BAKSMALIJAR=$C_PADIR/vendor/blobscript/smali/baksmali.jar
+    export SMALIJAR=$C_PADIR/vendor/blobscript/smali/smali.jar
+elif [[ -f $C_LINEAGEDIR/vendor/lineage/build/tools/smali/baksmali.jar && -f $C_LINEAGEDIR/vendor/lineage/build/tools/smali/smali.jar ]]; then
+    export BAKSMALIJAR=$C_LINEAGEDIR/vendor/lineage/build/tools/smali/baksmali.jar
+    export SMALIJAR=$C_LINEAGEDIR/vendor/lineage/build/tools/smali/smali.jar
+else
+    echo -e "${lightred}baksmali.jar &/ smali.jar not found!${nc}"
+    exit 1
 fi
 
-for app in $@; do
-    app_dir=$(find * -type d -name "$app")
+# Process
+BOOTOAT=$(readlink -f framework/$device_arch/boot.oat)
 
-    if [ -f $app_dir/oat/$device_arch/$app.odex ]; then
-        oat2dex $app_dir/oat/$device_arch/$app.odex framework/$device_arch/odex
-        mv $app_dir/oat/$device_arch/$app.dex $app_dir/oat/$device_arch/classes.dex
-        zip -gjq $app_dir/$app.apk $app_dir/oat/$device_arch/classes.dex
+for module in $@; do
+    FPATH=$(readlink -f $module)
+    if [[ -z $(unzip -l $FPATH | grep classes.dex) ]]; then
+        # Detect apk or jar
+        if [[ $module = *.apk ]]; then
+            APPDIR=$(find * -type d -name "$(basename $module .apk)")
+            OAT=$(readlink -f $APPDIR/oat/$device_arch)
+            DEX=$(readlink -f $OAT/$(basename $module .apk).odex)
+        elif [[ $module = *.jar ]]; then
+            OAT=$(readlink -f framework/oat/$device_arch)
+            DEX=$(readlink -f $OAT/$(basename $module .jar).odex)
+        fi
 
-        echo "Deodexed apk: $app_dir/$app.apk"
+        # Make backup
+        cp $FPATH ${FPATH}.oldbak
+
+        # Assemble classes.dex
+        java -jar "$BAKSMALIJAR" deodex -o "$TMPDIR/dexout" -b "$BOOTOAT" -d "$OAT" "$DEX"
+        java -jar "$SMALIJAR" assemble "$TMPDIR/dexout" -o "$TMPDIR/classes.dex"
+
+        # Pack deodexed module
+        zip -gjq $FPATH $TMPDIR/classes.dex
+
+        # Cleanup
+        rm -rf $TMPDIR/dexout/*
+        rm $TMPDIR/classes.dex
+
+        echo -e "${lightgreen}Deodexed: $FPATH${nc}"
     else
-        echo "$app_dir/$app.apk is already deodexed"
+        echo -e "${lightblue} $FPATH already deodexed${nc}"
     fi
 done
+
+rm -rf $TMPDIR
