@@ -26,7 +26,7 @@ if [[ "$(mount | grep work)" ]]; then
     export C_WORKDIR="/work";
     export C_ANDROIDWORKDIR="/work/Android";
 
-    export PATH=${C_WORKDIR}/bin:${C_ANDROIDWORKDIR}/Sdk/platform-tools:$PATH
+    export PATH=${C_WORKDIR}/bin:${C_ANDROIDWORKDIR}/Sdk/platform-tools:$HOME/.dotfiles/bin:$PATH
 else
 	export C_ANDROIDWORKDIR="${HOME}";
 fi
