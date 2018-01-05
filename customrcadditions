@@ -160,9 +160,9 @@ alias superr_kenzo='cd ${C_SUPERRDIR}/superr_kenzo'
 alias superr_hydrogen='cd ${C_SUPERRDIR}/superr_hydrogen' 
 
 #------------------------------------------////
-# Distro Specific Aliases/Functions
+# Misc
 #------------------------------------------////
 
-# Arch-Deepin
-# Mouted at: /run/user/$UID/gvfs/mtp*
-function mtp-mount-gio() { gio mount -li | awk -F= '{if(index($2,"mtp") == 1)system("gio mount "$2)}'; }
+# Adrian's Android Dev Tools
+export ANDROID_DEV_DRIVE=$C_ANDROIDWORKDIR;
+source "android_development_shell_tools/android_development_shell_tools.rc";

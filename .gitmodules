@@ -1,3 +1,6 @@
 [submodule "hub"]
 	path = hub
 	url = https://github.com/github/hub.git
+[submodule "android_development_shell_tools"]
+	path = android_development_shell_tools
+	url = https://github.com/AdrianDC/android_development_shell_tools.git
