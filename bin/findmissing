@@ -1,0 +1,145 @@
+#!/bin/bash
+
+# Colors
+black='\e[0;30m'
+blue='\e[0;34m'
+green='\e[0;32m'
+cyan='\e[0;36m'
+red='\e[0;31m'
+purple='\e[0;35m'
+brown='\e[0;33m'
+lightgray='\e[0;37m'
+darkgray='\e[1;30m'
+lightblue='\e[1;34m'
+lightgreen='\e[1;32m'
+lightcyan='\e[1;36m'
+lightred='\e[1;31m'
+lightpurple='\e[1;35m'
+yellow='\e[1;33m'
+white='\e[1;37m'
+nc='\e[0m'
+
+
+usage() {
+cat <<USAGE
+
+Usage:
+        bash $(basename $0) <LIB_PATH> [OPTIONS]
+
+Examples:   $(basename $0) vendor/lib64/libril-qc-qmi-1.so 
+
+
+OPTIONS:
+    -h, --help
+        Display this help message
+
+    -a, --viaadb
+        Pulls the list of system files via adb
+
+    -r, --findallreference
+        Find all missing references and not just only libraries
+
+    -p, --plain
+        Output in plain ugly format. 
+        Why? Say we wanna find missing refs for multiple libs, we can run this with --plain
+        and then sort and remove duplicate ones for easy reading.
+
+USAGE
+}
+
+# Setup getopt.
+long_opts="help,useadb,findallreference,plain"
+getopt_cmd=$(getopt -o harp --long "$long_opts" \
+            -n $(basename $0) -- "$@") || \
+            { echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
+
+eval set -- "$getopt_cmd"
+
+while true; do
+    case "$1" in
+        -h|--help) usage; exit 0;;
+        -a|--useadb) USE_ADB="true";;
+        -r|--findallreference) FIND_ALL_REFERENCE="true";;
+        -p|--plain) PLAIN="true";;
+        --) shift; break;;
+    esac
+    shift
+done
+
+# Mandatory argument
+if [ $# -eq 0 ]; then
+    echo -e "\nERROR: Missing mandatory argument: LIB\n"
+    usage
+    exit 1
+fi
+
+# Temp work dir
+TMPDIR=$(mktemp -d)
+
+if [[ "$USE_ADB" == "true" ]]; then
+    SYSTEM_FILES_PATH="$TMPDIR/all_files.txt"
+
+    # Check for device
+    echo -e "${lightpurple} Waiting for device...${nc}"
+    ADB_STATUS=$(adb devices | tail -2 | head -1 | cut -f 2 | sed 's/ *$//g')
+    while [[ "$ADB_STATUS" != "device" || "$ADB_STATUS" != "recovery" ]]; do
+        sleep 2
+    done
+    adb root && adb wait-for-$ADB_STATUS remount
+
+    # Dump list of all files
+    adb shell find /system/ > $SYSTEM_FILES_PATH
+elif [[ -f ../00_project_files/all_files.txt ]]; then
+    SYSTEM_FILES_PATH=$(readlink -f ../00_project_files/all_files.txt)
+elif [[ -f 00_project_files/all_files.txt ]]; then
+    SYSTEM_FILES_PATH=$(readlink -f 00_project_files/all_files.txt)
+elif [[ -f all_files.txt ]]; then
+    SYSTEM_FILES_PATH=$(readlink -f all_files.txt)
+else
+    echo -e "${lightred}Couldn't find all_files.txt${nc}"
+fi
+
+# Process
+BLOB_DEP=$(readlink -f $TMPDIR/blobdep.txt)
+MISSING_LIST=$(readlink -f $TMPDIR/missing.txt)
+process_file() {
+    if [[ "$FIND_ALL_REFERENCE" == "true" ]]; then
+        depstrser $1 -s > $BLOB_DEP
+    else
+        depstrser $1 -ls > $BLOB_DEP
+    fi
+
+    if [[ -z $PLAIN ]]; then
+        echo -e "${lightcyan}Looking for missing references in $(basename $1)${nc}"
+    fi
+
+    touch $MISSING_LIST
+    cat $BLOB_DEP | while read blobstring
+    do
+        if [[ $(grep -m 1 "$blobstring" $SYSTEM_FILES_PATH 2> /dev/null) == "" ]]; then
+            if [[ -z $PLAIN ]]; then
+                echo -e "${lightred}✘${nc} $blobstring" >> $MISSING_LIST
+            else
+                echo -e "$blobstring" >> $MISSING_LIST
+            fi
+        fi
+    done
+}
+
+for module in $*; do
+    process_file $module
+
+    # Finally sort and remove duplicates
+    sort -u $MISSING_LIST > $TMPDIR/tmp && mv $TMPDIR/tmp $MISSING_LIST
+    if [[ $(cat $MISSING_LIST) == "" ]]; then
+        if [[ -z $PLAIN ]]; then
+            echo -e "${lightgreen}✔ None${nc}"
+        fi
+    else
+        cat $MISSING_LIST
+    fi
+    rm $MISSING_LIST
+done
+
+# Cleanup
+rm -rf $TMPDIR

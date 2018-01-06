@@ -1,8 +1,82 @@
 #!/bin/bash
-process_file() {
-	strings $1 | grep -i "\.so\|\.xml\|\.conf\|\.txt\|\.cfg\|\.dat"
+
+# Colors
+lightgreen='\e[1;32m'
+nc='\e[0m'
+
+# Temp work dir
+TMPDIR=$(mktemp -d)
+
+usage() {
+cat <<USAGE
+
+Usage:
+        bash $(basename $0) <LIB_PATH> [OPTIONS]
+
+Examples:   $(basename $0) vendor/lib64/libril.so -sl
+        Will show dependendent libraries
+
+OPTIONS:
+    -h, --help
+        Display this help message
+
+    -l, --libsonly
+        Only grep dependent .so libraries
+
+    -s, --silent
+        Print plain output list
+
+USAGE
 }
 
-for lib in $*; do
-	process_file $lib
+# Setup getopt.
+long_opts="libsonly,silent"
+getopt_cmd=$(getopt -o hls --long "$long_opts" \
+            -n $(basename $0) -- "$@") || \
+            { echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
+
+eval set -- "$getopt_cmd"
+
+while true; do
+    case "$1" in
+        -h|--help) usage; exit 0;;
+        -l|--libsonly) LIBS_ONLY="true";;
+        -s|--silent) SILENT="true";;
+        --) shift; break;;
+    esac
+    shift
 done
+
+# Mandatory argument
+if [ $# -eq 0 ]; then
+    echo -e "\nERROR: Missing mandatory argument: LIB\n"
+    usage
+    exit 1
+fi
+
+process_file() {
+    if [[ "$LIBS_ONLY" == "true" ]]; then
+        strings -a $1 | grep "\\.so" > $TMPDIR/dep.txt;
+    else
+        strings -a $1 | grep "\\.so\|\\.txt\|\\.xml\|\\.conf\|\\.cfg\|\\.dat" > $TMPDIR/dep.txt;
+    fi
+
+    cat $TMPDIR/dep.txt | while read blobstring
+    do
+        if [[ "$blobstring" == ".data" || "$blobstring" == ".data.rel.ro" || "$blobstring" == "" ]]; then
+            continue
+        else
+            echo "$blobstring"
+        fi
+    done
+}
+
+for module in $*; do
+    if [[ -z $SILENT ]]; then
+        echo -e "${lightgreen}Checking dependencies for module: $(basename $module)${nc}"
+    fi
+    process_file $(readlink -f $module)
+done
+
+# Cleanup
+rm -rf $TMPDIR
