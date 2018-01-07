@@ -26,7 +26,7 @@ if [[ "$(mount | grep work)" ]]; then
     export C_WORKDIR="/work";
     export C_ANDROIDWORKDIR="/work/Android";
 
-    export PATH=${C_WORKDIR}/bin:${C_ANDROIDWORKDIR}/Sdk/platform-tools:$HOME/.dotfiles/bin:$PATH
+    export PATH=${C_WORKDIR}/bin:${C_ANDROIDWORKDIR}/Sdk/platform-tools:$PATH
 else
 	export C_ANDROIDWORKDIR="${HOME}";
 fi
@@ -59,7 +59,7 @@ export USE_CCACHE=1
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
 # Jack is the new Java compiler used from Android 7. It is known to run out of memory - a simple fix is to run this command:
 export ANDROID_JACK_VM_ARGS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4G"
-export PATH=~/bin:$PATH
+export PATH=~/bin:$HOME/.dotfiles/bin:$PATH
 
 if [[ $HOSTNAME = "build2.dev.xda-developers.com" ]]; then
 	export PATH=~/install/java/bin:~/install/zsh/bin:$PATH
