@@ -31,9 +31,8 @@ echo "Installing zsh-autosuggestions..."
 git clone git://github.com/zsh-users/zsh-autosuggestions $ZSH/custom/plugins/zsh-autosuggestions
 
 for f in ~/.zshrc; do
-    echo "Adding customrcadditions, zshrc.local, android_development_shell_tools.rc to ~/.zshrc"
+    echo "Adding customrcadditions, zshrc.local to ~/.zshrc"
     [ -e "$f" ] && sed -i "1 i\source ~/.dotfiles/customrcadditions" ~/.zshrc
-    [ -e "$f" ] && sed -i "1 i\source ~/.dotfiles/android_development_shell_tools/android_development_shell_tools.rc" ~/.zshrc
     [ -e "$f" ] && sed -i "1 i\source ~/.dotfiles/zshrc.local" ~/.zshrc
 
     break

@@ -162,6 +162,3 @@ alias superr_hydrogen='cd ${C_SUPERRDIR}/superr_hydrogen'
 #------------------------------------------////
 # Misc
 #------------------------------------------////
-
-# Adrian's Android Dev Tools
-export ANDROID_DEV_DRIVE=$C_ANDROIDWORKDIR;
