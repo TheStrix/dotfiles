@@ -1,6 +1,8 @@
 #!/bin/bash
 
-adb wait-for-device root && adb wait-for-device remount
+ADBMODE=$(adb devices | tail -2 | head -1 | cut -f 2 | sed 's/ *$//g')
+
+adb wait-for-$ADBMODE root && adb wait-for-$ADBMODE remount
 for blob in $@; do
     adb push $blob /system/$blob
 done
