@@ -28,7 +28,7 @@ if [[ "$(mount | grep work)" ]]; then
 
     export PATH=${C_WORKDIR}/bin:${C_ANDROIDWORKDIR}/Sdk/platform-tools:$PATH
 else
-	export C_ANDROIDWORKDIR="${HOME}";
+    export C_ANDROIDWORKDIR="${HOME}";
 fi
 export C_LINEAGEDIR="${C_ANDROIDWORKDIR}/lineage";
 export C_PADIR="${C_ANDROIDWORKDIR}/pa";
@@ -61,10 +61,10 @@ export ANDROID_JACK_VM_ARGS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4G
 export PATH=~/bin:$HOME/.dotfiles/bin:$PATH
 
 if [[ $HOSTNAME = "build2.dev.xda-developers.com" ]]; then
-	export PATH=~/install/java/bin:~/install/zsh/bin:$PATH
-	export JAVA_HOME=~/install/java
-	export SHELL=`which zsh`
-	[ -z "$ZSH_VERSION" ] && exec "$SHELL" -l
+    export PATH=~/install/java/bin:~/install/zsh/bin:$PATH
+    export JAVA_HOME=~/install/java
+    export SHELL=`which zsh`
+    [ -z "$ZSH_VERSION" ] && exec "$SHELL" -l
 fi
 
 #------------------------------------------////
@@ -77,20 +77,44 @@ alias setperf='echo "performance" | sudo tee /sys/devices/system/cpu/cpu*/cpufre
 alias setsave='echo "powersave" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor'
 alias path='echo ${PATH}'
 alias android-studio='sh /opt/android-studio/bin/studio.sh'
-alias makekernel='make ARCH=arm64 CROSS_COMPILE="${C_LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
-alias makeoutkernel='make O=../out ARCH=arm64 CROSS_COMPILE="${C_LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"'
 alias superr='cd ${C_SUPERRDIR} && bash superr'
 alias jadx='bash ${C_ANDROIDWORKDIR}/jadx/build/jadx/bin/jadx-gui'
 alias jadx_cli='bash ${C_ANDROIDWORKDIR}/jadx/build/jadx/bin/jadx'
 alias venv=". $HOME/android/venv/bin/activate"
 
-if [[ -f ${C_PADIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump ]]; then
-	alias objdump_aarch64='${C_PADIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump'
-elif [[ -f ${C_LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump ]]; then
-	alias objdump_aarch64='${C_LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump'
+if [[ -d $C_PADIR ]]; then
+
+    # objdump_aarch64
+    if [[ -f ${C_PADIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump ]]; then
+        alias objdump_aarch64='${C_PADIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump'
+    else
+        alias objdump_aarch64='echo -e "${lightred}objdump file path not found!\nMake sure you have PA source code syned.\nCheck custombashrc for more.${nc}"'
+    fi
+
+    # aarch64 toolchain
+    if [[ -d "$C_PADIR/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin" ]]; then
+        aarch64_tc_bin="$C_PADIR/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin"
+    fi
+
+
+elif [[ -d $C_LINEAGEDIR ]]; then
+
+    # objdump_aarch64
+    if [[ -f ${C_LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump ]]; then
+        alias objdump_aarch64='${C_LINEAGEDIR}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/objdump'
+    else
+        alias objdump_aarch64='echo -e "${lightred}objdump file path not found!\nMake sure you have LAOS/PA source code syned.\nCheck custombashrc for more.${nc}"'
+    fi
+
+    # aarch64 toolchain
+    if [[ -d "$C_LINEAGEDIR/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin" ]]; then
+        aarch64_tc_bin="$C_LINEAGEDIR/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin"
+    fi
+
 else
-	alias objdump_aarch64='echo -e "${lightred}objdump file path not found!\nMake sure you have LAOS/PA source code syned.\nCheck custombashrc for more.${nc}"'
+    ANDROID_SOURCE_PRESENT="false"
 fi
+alias makeoutkernel='make O=../out ARCH=arm64 CROSS_COMPILE="${aarch64_tc_bin}/aarch64-linux-android-"'
 
 # ADB
 function adbrem() { adb root && adb wait-for-$(adb devices | tail -2 | head -1 | cut -f 2 | sed 's/ *$//g') remount; }
