@@ -116,7 +116,7 @@ else
 fi
 
 # Launch superr and user has to manually unpack it here
-cd ${C_SUPERRDIR} && bash superr
+cd ${C_SUPERRDIR} && ./superr
 
 echo -e "${yellow}Deleting system.img from $OLD_SUPERR_DIR as it's extracted${nc}"
 rm $OLD_SUPERR_DIR/system.img
