@@ -4,25 +4,29 @@
 
 clear
 echo Installing Dependencies!
+
 # Update
 sudo pacman -Syyu
-# Install pacaur
-sudo pacman -S pacaur
-# Downgrade curl for now
-#pacaur -S agetpkg-git --noconfirm
-#agetpkg --install curl 7.55.1 1
-#sudo sed -i '/\[options\]/a IgnorePkg = curl' /etc/pacman.conf
+
 # Import PGP signatures for ncurses5-compat-libs and lib32-ncurses5-compat-libs
 gpg --recv-keys 702353E0F7E48EDB
-# Install aosp-devel (and lineageos-devel because quite a few probably build Lineage/Lineage based ROMs as well.
-pacaur -S aosp-devel lineageos-devel --noconfirm
-# Just a couple of other useful tools I use, others do too probably
-pacaur -S hub neofetch fortune-mod figlet --noconfirm
 
-echo "All Done :'D"
-echo "Don't forget to run these commands before building, or make sure the python in your PATH is python2 and not python3"
-echo "
-virtualenv2 venv"
+# Install packages for building android
+yaourt -S bc bison ccache curl flex gcc-multilib git gnupg gperf jdk8-openjdk lib32-ncurses \
+lib32-ncurses5-compat-libs lib32-readline lib32-zlib libxslt ncurses ncurses5-compat-libs \
+perl-switch python2-virtualenv repo rsync schedtool sdl squashfs-tools unzip wxgtk zip zlib \
+ffmpeg imagemagick lzop ninja pngcrush xml2 gradle maven --noconfirm
+
+# Export JAVA_HOME
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
+
+# Just a couple of other useful tools I use, others do too probably
+yaourt -S hub neofetch fortune-mod figlet --noconfirm
+
+# The Android build process expects python to be python2. Create a python2 virtual environment and activate it.
+mkdir ~/android
+cd ~/android
+virtualenv2 venv
 
 # ADB ports setup
 if [ ! "$(which adb)" == "" ];
