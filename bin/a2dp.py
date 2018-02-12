@@ -1,4 +1,4 @@
-#! /usr/bin/env python3.5
+#! /usr/bin/env python3.6
 """
 
 Fixing bluetooth stereo headphone/headset problem in ubuntu 16.04 and also debian jessie, with bluez5.
@@ -34,6 +34,9 @@ Thanks to:
 
 Change Log
 ----------
+
+- 0.5.2
+  * Increasing the number of tries to 15.
 
 - 0.5.2
   * Optimizing waits.
@@ -88,7 +91,7 @@ import subprocess as sb
 import argparse
 
 
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 
 
 HEX_DIGIT_PATTERN = '[0-9A-F]'
@@ -97,7 +100,7 @@ MAC_ADDRESS_PATTERN = ':'.join((HEX_BYTE_PATTERN, ) * 6)
 DEVICE_PATTERN = re.compile('^(?:.*\s)?Device\s(?P<mac>%s)\s(?P<name>.*)' % MAC_ADDRESS_PATTERN)
 CONTROLLER_PATTERN = re.compile('^(?:.*\s)?Controller\s(?P<mac>%s)\s(?P<name>.*)' % MAC_ADDRESS_PATTERN)
 WAIT_TIME = 2.25
-TRIES = 7
+TRIES = 15
 PROFILE = 'a2dp'
 
 
