@@ -12,7 +12,7 @@ sudo pacman -Syyu
 gpg --recv-keys 702353E0F7E48EDB
 
 # Install packages for building android
-yaourt -S bc bison ccache curl flex gcc-multilib git gnupg gperf jdk8-openjdk lib32-ncurses \
+yaourt -S bc bison ccache curl flex gcc-multilib git gnupg gperf jdk8-openjdk lib32-gcc-libs lib32-ncurses \
 lib32-ncurses5-compat-libs lib32-readline lib32-zlib libxslt ncurses ncurses5-compat-libs \
 perl-switch python2-virtualenv repo rsync schedtool sdl squashfs-tools unzip wxgtk zip zlib \
 ffmpeg imagemagick lzop ninja pngcrush xml2 gradle maven --noconfirm
@@ -21,12 +21,21 @@ ffmpeg imagemagick lzop ninja pngcrush xml2 gradle maven --noconfirm
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
 
 # Just a couple of other useful tools I use, others do too probably
-yaourt -S hub neofetch fortune-mod figlet --noconfirm
+yaourt -S hub neofetch fortune-mod figlet gvfs-mtp --noconfirm
 
 # The Android build process expects python to be python2. Create a python2 virtual environment and activate it.
 mkdir ~/android
 cd ~/android
 virtualenv2 venv
+
+# Setup dotfiles
+echo -e "${yellow}Setting up dotfiles${nc}"
+mkdir ~/bin
+PATH=~/bin:$PATH
+. $HOME/.dotfiles/setup/setupdotfiles.sh
+
+# Source customrcadditions
+source ~/.dotfiles/customrcadditions
 
 # ADB ports setup
 if [ ! "$(which adb)" == "" ];
@@ -38,18 +47,4 @@ sudo chown root /etc/udev/rules.d/51-android.rules
 sudo udevadm control --reload-rules
 adb kill-server
 sudo killall adb
-fi
-
-# Setup dotfiles
-echo -e "${yellow}Setting up dotfiles${nc}"
-mkdir ~/bin
-PATH=~/bin:$PATH
-. $HOME/.dotfiles/setup/setupdotfiles.sh
-
-echo -ne "${yellow}Do you wish to source new bashrcadditions (y/n)?${nc}"
-read answer
-if echo -e "$answer" | grep -iq "^y" ;then
-    source ~/.dotfiles/customrcadditions
-else
-    echo
 fi
