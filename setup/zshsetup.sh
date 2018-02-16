@@ -3,15 +3,17 @@
 echo "Installing zsh"
 
 # Install ZSH
-if [[ ! -z $(which apt-get)  ]]; then
-	sudo apt-get install zsh -y
-elif [[ ! -z $(which pacaur) ]]; then
-	pacaur -S zsh zsh-completions --noconfirm
-elif [[ ! -z $(which pacman) ]]; then
-	sudo pacman -S zsh zsh-completions --noconfirm
-else
-	echo "cannot detect any known package manager"
-	exit 1
+if [[ -z $(which zsh) ]]; then
+	if [[ ! -z $(which apt-get)  ]]; then
+		sudo apt-get install zsh -y
+	elif [[ ! -z $(which yaourt) ]]; then
+		yaourt -S zsh zsh-completions --noconfirm
+	elif [[ ! -z $(which pacman) ]]; then
+		sudo pacman -S zsh zsh-completions --noconfirm
+	else
+		echo "cannot detect any known package manager"
+		exit 1
+	fi
 fi
 
 # Set zsh as default shell

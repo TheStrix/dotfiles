@@ -25,14 +25,13 @@ nc='\e[0m'
 if [[ "$(mount | grep work)" ]]; then
     export C_WORKDIR="/work";
     export C_ANDROIDWORKDIR="/work/Android";
-
-    export PATH=${C_WORKDIR}/bin:${C_ANDROIDWORKDIR}/Sdk/platform-tools:$PATH
 else
     export C_ANDROIDWORKDIR="${HOME}";
 fi
+export C_ANDROIDTOOLSDIR="${C_ANDROIDWORKDIR}/tools";
 export C_LINEAGEDIR="${C_ANDROIDWORKDIR}/lineage";
 export C_PADIR="${C_ANDROIDWORKDIR}/pa";
-export C_SUPERRDIR="${C_ANDROIDWORKDIR}/superr";
+export C_SUPERRDIR="${C_ANDROIDTOOLSDIR}/superr";
 export C_MIDEVDIR="${C_ANDROIDWORKDIR}/xiaomi-dev";
 
 function upinfo () {
@@ -58,13 +57,20 @@ export USE_CCACHE=1
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
 # Jack is the new Java compiler used from Android 7. It is known to run out of memory - a simple fix is to run this command:
 export ANDROID_JACK_VM_ARGS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4G"
-export PATH=~/bin:$HOME/.dotfiles/bin:$PATH
+export PATH=~/bin:$HOME/.dotfiles/bin:${C_WORKDIR}/bin:${C_ANDROIDTOOLSDIR}/Sdk/platform-tools:$PATH
 
 if [[ $HOSTNAME = "build2.dev.xda-developers.com" ]]; then
     export PATH=~/install/java/bin:~/install/zsh/bin:$PATH
     export JAVA_HOME=~/install/java
     export SHELL=`which zsh`
     [ -z "$ZSH_VERSION" ] && exec "$SHELL" -l
+fi
+
+# Golang
+if [[ -d $C_ANDROIDTOOLSDIR/go ]]; then
+    export GOPATH=${C_ANDROIDTOOLSDIR}/go
+    export GOBIN=$GOPATH/bin
+    export PATH=$GOBIN:$PATH
 fi
 
 #------------------------------------------////
@@ -78,8 +84,9 @@ alias setsave='echo "powersave" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/
 alias path='echo ${PATH}'
 alias android-studio='sh /opt/android-studio/bin/studio.sh'
 alias superr='cd ${C_SUPERRDIR} && ./superr'
-alias jadx='bash ${C_ANDROIDWORKDIR}/jadx/build/jadx/bin/jadx-gui'
-alias jadx_cli='bash ${C_ANDROIDWORKDIR}/jadx/build/jadx/bin/jadx'
+alias jadx='bash ${C_ANDROIDTOOLSDIR}/jadx/build/jadx/bin/jadx-gui'
+alias jadx_cli='bash ${C_ANDROIDTOOLSDIR}/jadx/build/jadx/bin/jadx'
+
 alias venv=". $HOME/android/venv/bin/activate"
 
 if [[ -d $C_PADIR ]]; then
@@ -115,6 +122,13 @@ else
     ANDROID_SOURCE_PRESENT="false"
 fi
 alias makeoutkernel='make O=../out ARCH=arm64 CROSS_COMPILE="${aarch64_tc_bin}/aarch64-linux-android-"'
+
+function batteryhistorian() {
+    echo -e "${lightgreen}Running historian...${nc}"
+    echo -e "${yellow}Visit http://localhost:9999${nc}"
+    cd $GOPATH/src/github.com/google/battery-historian
+    go run cmd/battery-historian/battery-historian.go 
+}
 
 # ADB
 function adbrem() { adb root && adb wait-for-$(adb devices | tail -2 | head -1 | cut -f 2 | sed 's/ *$//g') remount; }
