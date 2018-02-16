@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Copyright (c) 2012, The Linux Foundation. All rights reserved.
-# Copyright (C) 2017. Parth Bhatia (TheStrix) <parthbhatia98@gmail.com>
+# Copyright (C) 2017-2018. Parth Bhatia (TheStrix) <parthbhatia98@gmail.com>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -454,30 +454,35 @@ fi
 
 # Upload to GDrive / AFH
 if [[ "$UPLOAD" = "true" ]]; then
-  if [[ "$CURDIR" = lineage* ]]; then
-    if [[ "$TARGET" = "kenzo" ]]; then
-      echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
-      gdrive upload --parent 0B9JxQ_RHblHkZWpaejlPNUtjVEk ${OUT}/lineage-*.zip
-    elif [[ "$TARGET" = "hydrogen" ]]; then
-      echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
-      gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ${OUT}/lineage-*.zip
-    elif [[ "$TARGET" = "sagit" ]]; then
-      echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
-      gdrive upload --parent 0B9JxQ_RHblHkemswTVRkTERYdXM ${OUT}/lineage-*.zip
-    else
-      echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
-      gdrive upload ${OUT}/lineage-*.zip
-    fi
-  elif [[ "$CURDIR" = pa* ]]; then
-    if [[ "$TARGET" = "sagit" ]]; then
-      echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
-      gdrive upload --parent 0B9JxQ_RHblHkZHV1aFpxNUhzOUU ${OUT}/pa_*.zip
-    else
-      echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
-      gdrive upload ${OUT}/pa_*.zip
-    fi
+  if [[ "$IMAGE" == "bootimg" ]]; then
+    echo -e "${yellow}Uploading boot.img to drive${nc}"
+    gdrive upload --parent 1GAKzFhwEDC2LM-_iveXGMBUYoooQ1ud2 ${OUT}/boot.img
   else
-    echo -e "${yellow}Upload configured only for LineageOS & PA${nc}"
+    if [[ "$CURDIR" = lineage* ]]; then
+      if [[ "$TARGET" = "kenzo" ]]; then
+        echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
+        gdrive upload --parent 0B9JxQ_RHblHkZWpaejlPNUtjVEk ${OUT}/lineage-*.zip
+      elif [[ "$TARGET" = "hydrogen" ]]; then
+        echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
+        gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ${OUT}/lineage-*.zip
+      elif [[ "$TARGET" = "sagit" ]]; then
+        echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
+        gdrive upload --parent 0B9JxQ_RHblHkemswTVRkTERYdXM ${OUT}/lineage-*.zip
+      else
+        echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
+        gdrive upload ${OUT}/lineage-*.zip
+      fi
+    elif [[ "$CURDIR" = pa* ]]; then
+      if [[ "$TARGET" = "sagit" ]]; then
+        echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
+        gdrive upload --parent 0B9JxQ_RHblHkZHV1aFpxNUhzOUU ${OUT}/pa_*.zip
+      else
+        echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
+        gdrive upload ${OUT}/pa_*.zip
+      fi
+    else
+      echo -e "${yellow}Upload configured only for LineageOS & PA${nc}"
+    fi
   fi
 fi
 
