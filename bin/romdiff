@@ -42,6 +42,10 @@ else
 	exit 1
 fi
 
+grepdate() {
+	UTCDATE=$(grep "ro.build.date.utc" $1 | awk -F '=' '{print $2}')
+}
+
 usage() {
 	cat <<USAGE
 
@@ -123,16 +127,36 @@ rm $OLD_SUPERR_DIR/system.img
 
 echo -e "${lightgreen}Unpacking boot.img to 'bootimg'${nc}"
 bootaik $OLD_SUPERR_DIR/boot.img $OLD_SUPERR_DIR/bootimg
+sudo chown -R $USER:$USER $OLD_SUPERR_DIR/bootimg
 
-# Store MIUI versions to append if diff file names
-OLD_MIUI_VERSION=$(grep "ro.build.version.incremental" ${OLD_SUPERR_DIR}_old/system/build.prop | awk -F '=' '{print $2}')
-echo -e "${lightpurple}Old MIUI version: $OLD_MIUI_VERSION${nc}"
-NEW_MIUI_VERSION=$(grep "ro.build.version.incremental" $OLD_SUPERR_DIR/system/build.prop | awk -F '=' '{print $2}')
-echo -e "${lightpurple}New MIUI version: $NEW_MIUI_VERSION${nc}"
+if [[ -n $(grep "miui" $OLD_SUPERR_DIR/system/build.prop) ]]; then
+	# Store MIUI versions to append if diff file names
+	OLD_VERSION=$(grep "ro.build.version.incremental" ${OLD_SUPERR_DIR}_old/system/build.prop | awk -F '=' '{print $2}')
+	echo -e "${lightpurple}Old MIUI version: $OLD_VERSION${nc}"
+	NEW_VERSION=$(grep "ro.build.version.incremental" $OLD_SUPERR_DIR/system/build.prop | awk -F '=' '{print $2}')
+	echo -e "${lightpurple}New MIUI version: $NEW_VERSION${nc}"
+else
+	# Fetch OLD_VERSION & NEW_VERSION by grepping build date
+	grepdate ${OLD_SUPERR_DIR}_old/system/build.prop
+	OLD_VERSION=$(date +%Y%m%d -d @$UTCDATE)
+	echo -e "${lightpurple}Old version date: $OLD_VERSION${nc}"
+	grepdate ${OLD_SUPERR_DIR}/system/build.prop
+	NEW_VERSION=$(date +%Y%m%d -d @$UTCDATE)
+	echo -e "${lightpurple}New version date: $NEW_VERSION${nc}"
+fi
+
+# Check if any of the version is null
+if [[ -z $OLD_VERSION ]]; then
+	echo -e "${lightred}OLD_VERSION is NULL, exiting...${nc}"
+	exit 1
+elif [[ -z $NEW_VERSION ]]; then
+	echo -e "${lightred}NEW_VERSION is NULL, exiting...${nc}"
+	exit 1
+fi
 
 # Know the diff store path
 TARGET=$(grep "ro.build.description" $OLD_SUPERR_DIR/system/build.prop | awk -F '=|-' '{print $2}')
-DIFFDIR=$C_MIDEVDIR/miuidiff/$TARGET
+DIFFDIR=$C_OTHERSTUFFDIR/romdiff/$TARGET
 
 # Create dir if not present
 if [[ ! -e $DIFFDIR ]]; then
@@ -141,17 +165,17 @@ if [[ ! -e $DIFFDIR ]]; then
 fi
 
 # Copy old all_files.txt
-cp ${OLD_SUPERR_DIR}_old/00_project_files/all_files.txt $DIFFDIR/all_files-${OLD_MIUI_VERSION}.txt
+cp ${OLD_SUPERR_DIR}_old/00_project_files/all_files.txt $DIFFDIR/all_files-${OLD_VERSION}.txt
 
 # Create system.diff
 echo -e "${lightblue}Comparing two systems.\nOLD: ${OLD_SUPERR_DIR}_old/system\nNEW: $OLD_SUPERR_DIR/system${nc}"
-diff -bur ${OLD_SUPERR_DIR}_old/system $OLD_SUPERR_DIR/system > $DIFFDIR/system_${OLD_MIUI_VERSION}-${NEW_MIUI_VERSION}.diff
-echo -e "${lightgreen}Completed, diff stored at $DIFFDIR/system_${OLD_MIUI_VERSION}-${NEW_MIUI_VERSION}.diff\n${nc}"
+diff -bur ${OLD_SUPERR_DIR}_old/system $OLD_SUPERR_DIR/system > $DIFFDIR/system_${OLD_VERSION}-${NEW_VERSION}.diff
+echo -e "${lightgreen}Completed, diff stored at $DIFFDIR/system_${OLD_VERSION}-${NEW_VERSION}.diff\n${nc}"
 
 # Create boot.diff
 echo -e "${lightblue}Comparing two boot.\nOLD: ${OLD_SUPERR_DIR}_old/bootimg\nNEW: $OLD_SUPERR_DIR/bootimg${nc}"
-sudo diff -bur ${OLD_SUPERR_DIR}_old/bootimg $OLD_SUPERR_DIR/bootimg > $DIFFDIR/boot_${OLD_MIUI_VERSION}-${NEW_MIUI_VERSION}.diff
-echo -e "${lightgreen}Completed, diff stored at $DIFFDIR/boot_${OLD_MIUI_VERSION}-${NEW_MIUI_VERSION}.diff\n${nc}"
+sudo diff -bur ${OLD_SUPERR_DIR}_old/bootimg $OLD_SUPERR_DIR/bootimg > $DIFFDIR/boot_${OLD_VERSION}-${NEW_VERSION}.diff
+echo -e "${lightgreen}Completed, diff stored at $DIFFDIR/boot_${OLD_VERSION}-${NEW_VERSION}.diff\n${nc}"
 
 echo -e "${yellow}Do you want to delete old superr dump? Y/N${nc}"
 read choice

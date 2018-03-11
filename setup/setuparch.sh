@@ -15,7 +15,7 @@ gpg --recv-keys 702353E0F7E48EDB
 yaourt -S bc bison ccache curl flex gcc-multilib git gnupg gperf jdk8-openjdk lib32-gcc-libs lib32-ncurses \
 lib32-ncurses5-compat-libs lib32-readline lib32-zlib libxslt ncurses ncurses5-compat-libs \
 perl-switch python2-virtualenv repo rsync schedtool sdl squashfs-tools unzip wxgtk zip zlib \
-ffmpeg imagemagick lzop ninja pngcrush xml2 gradle maven --noconfirm
+ffmpeg imagemagick lzop ninja pngcrush xml2 gradle maven cpio --noconfirm
 
 # Export JAVA_HOME
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk

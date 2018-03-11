@@ -32,7 +32,7 @@ export C_ANDROIDTOOLSDIR="${C_ANDROIDWORKDIR}/tools";
 export C_LINEAGEDIR="${C_ANDROIDWORKDIR}/lineage";
 export C_PADIR="${C_ANDROIDWORKDIR}/pa";
 export C_SUPERRDIR="${C_ANDROIDTOOLSDIR}/superr";
-export C_MIDEVDIR="${C_ANDROIDWORKDIR}/xiaomi-dev";
+export C_OTHERSTUFFDIR="${C_ANDROIDWORKDIR}/otherstuff";
 
 function upinfo () {
     echo -ne "${yellow}$(hostname) ${lightred}uptime is ${lightblue} \t ";uptime | awk /'up/ {print $3,$4,$5,$6,$7,$8,$9,$10}'
