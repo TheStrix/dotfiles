@@ -1,8 +1,16 @@
 #!/bin/bash
 
-ADBMODE=$(adb devices | tail -2 | head -1 | cut -f 2 | sed 's/ *$//g')
+function push_impl() {
+    adb push $1 /system/$1
+    adb shell restorecon -R /system/$1
+}
 
+ADBMODE=$(adb devices | tail -2 | head -1 | cut -f 2 | sed 's/ *$//g')
 adb wait-for-$ADBMODE root && adb wait-for-$ADBMODE remount
 for blob in $@; do
-    adb push $blob /system/$blob
+    if [ -f $blob ] || [ -d $blob ]; then
+        push_impl $blob
+    else
+        find -name $blob | xargs push
+    fi
 done
