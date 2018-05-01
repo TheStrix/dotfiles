@@ -102,6 +102,11 @@ if [[ "$WIPESYSTEM" == "true" ]]; then
     adb shell twrp wipe system;
 fi
 
+# Make /sdcard/FlashZips if not present
+if [[ -z $(adb shell ls /sdcard | grep FlashZips) ]]; then
+    adb shell mkdir /sdcard/FlashZips
+fi
+
 for l in $@; do
     if [[ "$SAVE" == "true" ]]; then
         adb push $l /sdcard/FlashZips/
