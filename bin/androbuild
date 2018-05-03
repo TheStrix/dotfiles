@@ -225,10 +225,12 @@ if [ "$(mount | grep work)" ]; then
   KENZOCCACHE=/work/Android/.kenzoccache/
   HYDROGENCCACHE=/work/Android/.hydrogenccache/
   SAGITCCACHE=/work/Android/.sagitccache/
+  BERKELEYCCACHE=/work/Android/.berkeleyccache/
 else
   KENZOCCACHE=$HOME/.kenzoccache/
   HYDROGENCCACHE=$HOME/.hydrogenccache/
   SAGITCCACHE=$HOME/.sagitccache/
+  BERKELEYCCACHE=$HOME/.berkeleyccache/
 fi
 
 
@@ -247,6 +249,11 @@ setup_sagitccache() {
   export USE_CCACHE=1
 }
 
+setup_berkeleyccache() {
+  export CCACHE_DIR=$BERKELEYCCACHE
+  export USE_CCACHE=1
+}
+
 delete_kenzoccache() {
     export CCACHE_DIR=$KENZOCCACHE
     ccache -C
@@ -259,6 +266,11 @@ delete_hydrogenccache() {
 
 delete_sagitccache() {
   export CCACHE_DIR=$SAGITCCACHE
+  ccache -C
+}
+
+delete_berkeleyccache() {
+  export CCACHE_DIR=$BERKELEYCCACHE
   ccache -C
 }
 
@@ -277,6 +289,12 @@ create_hydrogenccache() {
 create_sagitccache() {
   echo -e "${lightgreen}\nINFO: Setting sagit CCACHE with 25 GB\n${nc}"
     setup_sagitccache
+    ccache -M 25G
+}
+
+create_berkeleyccache() {
+  echo -e "${lightgreen}\nINFO: Setting berkeley CCACHE with 25 GB\n${nc}"
+    setup_berkeleyccache
     ccache -M 25G
 }
 
@@ -369,6 +387,10 @@ if [[ "$DELTE_CCACHE" = "true" ]]; then
     echo -e "${lightgreen}Clearing sagit CCACHE dir $SAGITCCACHE${nc}"
     delete_sagitccache
   fi
+  if [[ "$TARGET" = "berkeley" ]]; then
+    echo -e "${lightgreen}Clearing berkeley CCACHE dir $BERKELEYCCACHE${nc}"
+    delete_berkeleyccache
+  fi
 fi
 
 if [[ "$TARGET" = "kenzo" ]]; then
@@ -395,6 +417,14 @@ if [[ "$TARGET" = "sagit" ]]; then
   fi
 fi
 
+if [[ "$TARGET" = "berkeley" ]]; then
+  if [[ ! -e $BERKELEYCCACHE ]]; then
+    echo -e "${lightgreen}berkeley CCACHE dir $BERKELEYCCACHE not found... Creating and setting it up!${nc}"
+    mkdir $BERKELEYCCACHE
+    create_berkeleyccache
+  fi
+fi
+
 if [ "$CCACHE" = "true" ]; then
   if [[ "$TARGET" = "kenzo" ]];
   then
@@ -409,6 +439,10 @@ if [ "$CCACHE" = "true" ]; then
   if [[ "$TARGET" = "sagit" ]]; then
     echo -e "${lightgreen}Setting up sagit CCACHE dir $SAGITCCACHE${nc}"
     setup_sagitccache
+  fi
+  if [[ "$TARGET" = "berkeley" ]]; then
+    echo -e "${lightgreen}Setting up berkeley CCACHE dir $BERKELEYCCACHE${nc}"
+    setup_berkeleyccache
   fi
 fi
 
@@ -472,6 +506,9 @@ if [[ "$UPLOAD" = "true" ]]; then
       elif [[ "$TARGET" = "sagit" ]]; then
         echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
         gdrive upload --parent 0B9JxQ_RHblHkemswTVRkTERYdXM ${OUT}/lineage-*.zip
+      elif [[ "$TARGET" = "berkeley" ]]; then
+        echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
+        gdrive upload --parent 1ZguqcdEaU5DeOCryvF61bIni_nRn_HJR ${OUT}/lineage-*.zip
       else
         echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
         gdrive upload ${OUT}/lineage-*.zip
