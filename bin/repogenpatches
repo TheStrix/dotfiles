@@ -35,7 +35,7 @@ repo forall -j"$(expr $(grep -c ^processor /proc/cpuinfo) \* 3)" -c "
         if [ \${changescount} -ne 0 ]; then
 
             # Add repo patch to repositories.txt
-            if [[ -z \"${filter_projects}\" ]]; then
+            if [ -z \"${filter_projects}\" ]; then
                 echo \"\${REPO_PATH}\" >> \"${repolistfile}\";
             fi;
 
@@ -43,7 +43,7 @@ repo forall -j"$(expr $(grep -c ^processor /proc/cpuinfo) \* 3)" -c "
             git format-patch HEAD...FETCH_HEAD > /dev/null;
 
             # Delete and make dir
-            if [[ -d \"${patcherdir}\"/patches/\${REPO_PATH} ]]; then
+            if [ -d \"${patcherdir}\"/patches/\${REPO_PATH} ]; then
                 rm -rf \"${patcherdir}\"/patches/\${REPO_PATH};
             fi;
             mkdir -p \"${patcherdir}\"/patches/\${REPO_PATH};
@@ -52,14 +52,16 @@ repo forall -j"$(expr $(grep -c ^processor /proc/cpuinfo) \* 3)" -c "
             for file in \$(find ${curdir}/\${REPO_PATH} -maxdepth 1 | grep patch); do
                 mv \$file \"${patcherdir}\"/patches/\${REPO_PATH};
             done;
-            printf \"\n\n Generated patches for \${changescount} local changes in \${REPO_PATH}\";
+            echo '';
+            printf \"\r\033[K Generated patches for \${changescount} local changes in \${REPO_PATH}\";
+            echo '';
         fi;
 
         # Detect local differences
         if [ \$(git diff --quiet; echo \${?}) -ne 0 ]; then
             printf \"\n\n [Project \${REPO_PROJECT}] Unmerged differences\";
             echo '';
-            echo -e \"\e[1;31m Warning: Ignoring uncommitted changes...\e[0m\";
+            echo -e \"\r\033[K\e[1;31m Warning: Ignoring uncommitted changes...\e[0m\";
             git --no-pager diff;
         fi;
     fi;
