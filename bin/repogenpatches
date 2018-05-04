@@ -49,7 +49,7 @@ repo forall -j"$(expr $(grep -c ^processor /proc/cpuinfo) \* 3)" -c "
             mkdir -p \"${patcherdir}\"/patches/\${REPO_PATH};
 
             # Move the patches to patcher
-            for file in \$(find ${curdir}/\${REPO_PATH} -maxdepth 1 | grep patch); do
+            for file in \$(find ${curdir}/\${REPO_PATH} -maxdepth 1 -iname '*.patch'); do
                 mv \$file \"${patcherdir}\"/patches/\${REPO_PATH};
             done;
             echo '';
