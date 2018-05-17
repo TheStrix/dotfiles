@@ -16,9 +16,10 @@ fi
 echo '';
 echo -n ' Scanning...';
 
-# Clear repolistfile
+# Clear repolistfile & patches
 if [[ -z $filter_projects ]]; then
     truncate -s 0 $repolistfile
+    rm -rf $patcherdir/patches
 fi
 
 repo forall -j"$(expr $(grep -c ^processor /proc/cpuinfo) \* 3)" -c "
@@ -26,6 +27,14 @@ repo forall -j"$(expr $(grep -c ^processor /proc/cpuinfo) \* 3)" -c "
     if [ ! -z \"${filter_projects}\" ] && ! echo \"\${REPO_PATH}\" | grep -iq \"${filter_projects}\"; then
         printf \"\r\033[K Ignoring \${REPO_PROJECT} [\${REPO_REMOTE}/\${REPO_RREV##*/}] \";
     else
+        # Skip android_patcher project if present
+        if [ \"\${REPO_PATH}\" = \"patcher\" ]; then
+            echo '';
+            printf \"\r\033[K Ignoring patches for \${REPO_PATH}\";
+            echo '';
+            exit;
+        fi;
+
         # Show and fetch projects
         printf \"\r\033[K Scanning \${REPO_PROJECT} [\${REPO_REMOTE}/\${REPO_RREV##*/}] \";
         git fetch --quiet \${REPO_REMOTE} \${REPO_RREV##*/};
