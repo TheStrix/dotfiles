@@ -114,14 +114,13 @@ for l in $@; do
 
     if [[ -z $(adb shell ls /sdcard/FlashZips/$(basename $l) 2>/dev/null) ]]; then
         # Sideload if the zip isn't saved
-        adb shell twrp sideload
-        adb sideload $l
+        adb wait-for-recovery shell twrp sideload
+        adb wait-for-sideload sideload $l
     else
         # Flash the zip from device storage if found in /sdcard/FlashZips
         ZIP_PATH=/sdcard/FlashZips/$(basename $l)
         adb shell twrp install $ZIP_PATH
     fi
-
 done
 
 echo -e "${yellow}Do you want to reboot to system? Y/N${nc}"
