@@ -73,7 +73,7 @@ OPTIONS:
         Clean build - build from scratch by removing entire out dir
 
     -n, --dirty_build
-        Dirty build - Use 'make installclean'
+        Dirty build - Use 'm -j installclean'
 
     -t, --delete_ccache
         Delete ccache - clean ccache for device mentioned
@@ -125,29 +125,29 @@ USAGE
 
 clean_build() {
     echo -e "${yellow}\nINFO: Removing entire out dir. . .\n${nc}"
-    make clobber $@
+    m -j clobber $@
 }
 
 dirty_build() {
-    echo -e "${yellow}\nINFO: Executing 'make installclean'. . .\n${nc}"
+    echo -e "${yellow}\nINFO: Executing 'm -j installclean'. . .\n${nc}"
     #echo -e "${yellow}\nDeleting $CURDIR/out/target/product/$TARGET/obj/KERNEL_OBJ\n${nc}"
     #rm -rf out/target/product/$TARGET/obj/KERNEL_OBJ
-    make installclean $@
+    m -j installclean $@
 }
 
 build_android() {
     echo -e "${yellow}\nINFO: Build Android tree for $TARGET\n${nc}"
     if [[ "$CURDIR" = "aosp" ]]; then
       if [ "$LOG" = "true" ]; then
-        make otapackage $@ | tee $LOG_FILE.log
+        m -j otapackage $@ | tee $LOG_FILE.log
       else
-        make otapackage $@
+        m -j otapackage $@
       fi
     else
       if [ "$LOG" = "true" ]; then
-        make bacon $@ | tee $LOG_FILE.log
+        m -j bacon $@ | tee $LOG_FILE.log
       else
-        make bacon $@
+        m -j bacon $@
       fi
     fi
 }
@@ -155,9 +155,9 @@ build_android() {
 build_bootimg() {
     echo -e "${yellow}\nINFO: Build bootimage for $TARGET\n${nc}"
     if [ "$LOG" = "true" ]; then
-      make bootimage $@ | tee $LOG_FILE.log
+      m -j bootimage $@ | tee $LOG_FILE.log
     else
-      make bootimage $@
+      m -j bootimage $@
     fi
 }
 
@@ -169,36 +169,36 @@ build_recoveryimg() {
     echo -e "${lightpurple}Setting TW_DEVICE_VERSION=$TW_DEVICE_VERSION${nc}"
     export TW_DEVICE_VERSION=$TW_DEVICE_VERSION
     if [ "$LOG" = "true" ]; then
-      make recoveryimage adbd $@ | tee $LOG_FILE.log
+      m -j recoveryimage adbd $@ | tee $LOG_FILE.log
     else
-      make recoveryimage adbd $@
+      m -j recoveryimage adbd $@
     fi
 }
 
 build_sysimg() {
     echo -e "${yellow}\nINFO: Build systemimage for $TARGET\n${nc}"
     if [ "$LOG" = "true" ]; then
-      make systemimage $@ | tee $LOG_FILE.log
+      m -j systemimage $@ | tee $LOG_FILE.log
     else
-      make systemimage $@
+      m -j systemimage $@
     fi
 }
 
 build_usrimg() {
     echo -e "${yellow}\nINFO: Build userdataimage for $TARGET\n${nc}"
     if [ "$LOG" = "true" ]; then
-      make userdataimage $@ | tee $LOG_FILE.log
+      m -j userdataimage $@ | tee $LOG_FILE.log
     else
-      make userdataimage $@
+      m -j userdataimage $@
     fi
 }
 
 build_module() {
     echo -e "${yellow}\nINFO: Build $MODULE for $TARGET\n${nc}"
     if [ "$LOG" = "true" ]; then
-      make $MODULE $@ | tee $LOG_FILE.log
+      m -j $MODULE $@ | tee $LOG_FILE.log
     else
-      make $MODULE $@
+      m -j $MODULE $@
     fi
 }
 
@@ -214,9 +214,9 @@ build_project() {
 update_api() {
     echo -e "${yellow}\nINFO: Updating APIs\n${nc}"
     if [ "$LOG" = "true" ]; then
-      make update-api | tee $LOG_FILE.log
+      m -j update-api | tee $LOG_FILE.log
     else
-      make update-api
+      m -j update-api
     fi
 }
 

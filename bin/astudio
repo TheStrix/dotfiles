@@ -1,7 +1,7 @@
 #!/bin/bash
 
-S_PATH=$HOME/android-studio/bin/studio.sh
+S_PATH=/work/Android/tools/android-studio/canary
 
 for file in $*; do
-	sh $S_PATH $file > /dev/null 2>&1 &
+	sh $S_PATH/bin/studio.sh $file > /dev/null 2>&1 &
 done
