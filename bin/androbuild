@@ -73,7 +73,7 @@ OPTIONS:
         Clean build - build from scratch by removing entire out dir
 
     -n, --dirty_build
-        Dirty build - Use 'm -j installclean'
+        Dirty build - Use 'mka installclean'
 
     -t, --delete_ccache
         Delete ccache - clean ccache for device mentioned
@@ -125,29 +125,29 @@ USAGE
 
 clean_build() {
     echo -e "${yellow}\nINFO: Removing entire out dir. . .\n${nc}"
-    m -j clobber $@
+    ${MAKE} clobber $@
 }
 
 dirty_build() {
-    echo -e "${yellow}\nINFO: Executing 'm -j installclean'. . .\n${nc}"
+    echo -e "${yellow}\nINFO: Executing 'mka installclean'. . .\n${nc}"
     #echo -e "${yellow}\nDeleting $CURDIR/out/target/product/$TARGET/obj/KERNEL_OBJ\n${nc}"
     #rm -rf out/target/product/$TARGET/obj/KERNEL_OBJ
-    m -j installclean $@
+    ${MAKE} installclean $@
 }
 
 build_android() {
     echo -e "${yellow}\nINFO: Build Android tree for $TARGET\n${nc}"
     if [[ "$CURDIR" = "aosp" ]]; then
       if [ "$LOG" = "true" ]; then
-        m -j otapackage $@ | tee $LOG_FILE.log
+        ${MAKE} otapackage $@ | tee $LOG_FILE.log
       else
-        m -j otapackage $@
+        ${MAKE} otapackage $@
       fi
     else
       if [ "$LOG" = "true" ]; then
-        m -j bacon $@ | tee $LOG_FILE.log
+        ${MAKE} bacon $@ | tee $LOG_FILE.log
       else
-        m -j bacon $@
+        ${MAKE} bacon $@
       fi
     fi
 }
@@ -155,9 +155,9 @@ build_android() {
 build_bootimg() {
     echo -e "${yellow}\nINFO: Build bootimage for $TARGET\n${nc}"
     if [ "$LOG" = "true" ]; then
-      m -j bootimage $@ | tee $LOG_FILE.log
+      ${MAKE} bootimage $@ | tee $LOG_FILE.log
     else
-      m -j bootimage $@
+      ${MAKE} bootimage $@
     fi
 }
 
@@ -169,36 +169,36 @@ build_recoveryimg() {
     echo -e "${lightpurple}Setting TW_DEVICE_VERSION=$TW_DEVICE_VERSION${nc}"
     export TW_DEVICE_VERSION=$TW_DEVICE_VERSION
     if [ "$LOG" = "true" ]; then
-      m -j recoveryimage adbd $@ | tee $LOG_FILE.log
+      ${MAKE} recoveryimage adbd $@ | tee $LOG_FILE.log
     else
-      m -j recoveryimage adbd $@
+      ${MAKE} recoveryimage adbd $@
     fi
 }
 
 build_sysimg() {
     echo -e "${yellow}\nINFO: Build systemimage for $TARGET\n${nc}"
     if [ "$LOG" = "true" ]; then
-      m -j systemimage $@ | tee $LOG_FILE.log
+      ${MAKE} systemimage $@ | tee $LOG_FILE.log
     else
-      m -j systemimage $@
+      ${MAKE} systemimage $@
     fi
 }
 
 build_usrimg() {
     echo -e "${yellow}\nINFO: Build userdataimage for $TARGET\n${nc}"
     if [ "$LOG" = "true" ]; then
-      m -j userdataimage $@ | tee $LOG_FILE.log
+      ${MAKE} userdataimage $@ | tee $LOG_FILE.log
     else
-      m -j userdataimage $@
+      ${MAKE} userdataimage $@
     fi
 }
 
 build_module() {
     echo -e "${yellow}\nINFO: Build $MODULE for $TARGET\n${nc}"
     if [ "$LOG" = "true" ]; then
-      m -j $MODULE $@ | tee $LOG_FILE.log
+      ${MAKE} $MODULE $@ | tee $LOG_FILE.log
     else
-      m -j $MODULE $@
+      ${MAKE} $MODULE $@
     fi
 }
 
@@ -214,9 +214,9 @@ build_project() {
 update_api() {
     echo -e "${yellow}\nINFO: Updating APIs\n${nc}"
     if [ "$LOG" = "true" ]; then
-      m -j update-api | tee $LOG_FILE.log
+      ${MAKE} update-api | tee $LOG_FILE.log
     else
-      m -j update-api
+      ${MAKE} update-api
     fi
 }
 
@@ -300,7 +300,6 @@ create_berkeleyccache() {
 
 # Set defaults
 VARIANT="userdebug"
-JOBS=16
 if [[ $HOSTNAME = "build3.de.xda-developers.com" ]]; then
   CCACHE="false"
 else
@@ -333,7 +332,14 @@ while true; do
         -d|--debug) DEBUG="true";;
         -h|--help) usage; exit 0;;
         -i|--image) IMAGE="$2"; shift;;
-        -j|--jobs) JOBS="$2"; shift;;
+        -j|--jobs)
+        if [[ "$2" -gt 0 ]]; then
+            JOBS="$2"
+        else
+            echo -e "Please specify as value for jobs"
+            exit 1
+        fi
+        shift;;
         -k|--kernel_defconf) DEFCONFIG="$2"; shift;;
         -l|--log) LOG="true";;
         -m|--module) MODULE="$2"; shift;;
@@ -364,7 +370,10 @@ if [ "$LOG" = "true" ]; then
     LOG_FILE=$TARGET
 fi
 
-CMD="-j $JOBS"
+CMD=""
+if [[ ! -z $JOBS ]]; then
+  CMD+="-j$JOBS"
+fi
 if [ "$DEBUG" = "true" ]; then
     CMD+=" showcommands"
 fi
@@ -457,6 +466,16 @@ elif [[ "$CURDIR" = pa* ]]; then
 lunch pa_$TARGET-$VARIANT
 else
 lunch aosp_$TARGET-$VARIANT
+fi
+
+if [[ "$(command -v 'mka')" ]]; then
+  if [[ -z "${JOBS}" ]]; then
+    MAKE="mka"
+  else
+    MAKE="make"
+  fi
+else
+  MAKE="make"
 fi
 
 if [ "$CLEAN_BUILD" = "true" ]; then
