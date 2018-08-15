@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo -e "${lightgreen}1. hastebin.com\t 2. haste.akhilnarang.me${nc}"
 read choice

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "Installing zsh"
 
@@ -35,8 +35,9 @@ echo "Installing zsh-autosuggestions..."
 zsh -c 'git clone git://github.com/zsh-users/zsh-autosuggestions $ZSH/custom/plugins/zsh-autosuggestions'
 
 for f in ~/.zshrc; do
-    echo "Adding customrcadditions, zshrc.local to ~/.zshrc"
-    [ -e "$f" ] && sed -i "1 i\source ~/.dotfiles/customrcadditions" ~/.zshrc
+    echo "Adding local functions, zshrc.local to ~/.zshrc"
+    [ -e "$f" ] && sed -i "1 i\onLogin" ~/.zshrc
+    [ -e "$f" ] && sed -i "1 i\source ~/.dotfiles/functions" ~/.zshrc
     [ -e "$f" ] && sed -i "1 i\source ~/.dotfiles/zshrc.local" ~/.zshrc
     break
 done

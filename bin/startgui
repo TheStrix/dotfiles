@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Start sddm service, if it exists.    
 if service --status-all | grep -Fq 'sddm'; then    

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 USERNAME=ParthB
 EMAIL=bhatiaparth07@gmail.com

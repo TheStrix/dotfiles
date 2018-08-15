@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 curl --ftp-pasv -T $1 ftp://TheStrix:brxfNEIYOauQ@uploads.androidfilehost.com/$2

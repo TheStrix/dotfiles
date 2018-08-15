@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 adduser parth
 usermod -aG sudo parth

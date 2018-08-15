@@ -23,19 +23,14 @@ export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
 # Just a couple of other useful tools I use, others do too probably
 yaourt -S hub neofetch fortune-mod figlet gvfs-mtp --noconfirm
 
-# The Android build process expects python to be python2. Create a python2 virtual environment and activate it.
-mkdir ~/android
-cd ~/android
-virtualenv2 venv
-
 # Setup dotfiles
 echo -e "${yellow}Setting up dotfiles${nc}"
 mkdir ~/bin
 PATH=~/bin:$PATH
 . $HOME/.dotfiles/setup/setupdotfiles.sh
 
-# Source customrcadditions
-source ~/.dotfiles/customrcadditions
+# Source functions
+source ~/.dotfiles/functions
 
 # ADB ports setup
 if [ ! "$(which adb)" == "" ];

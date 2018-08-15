@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # REQUIREMENT: cd into $ROM_DUMP/system & then proceed
 

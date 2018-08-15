@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 DTB=$(find . -name "*.dtb" | head -1)
 [[ -z $DTB ]] && exit

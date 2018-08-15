@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 S_PATH=/work/Android/tools/android-studio/canary
 

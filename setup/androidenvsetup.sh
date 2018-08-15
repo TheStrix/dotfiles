@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Copyright � 2015-2016, Akhil Narang "akhilnarang" <akhilnarang.1999@gmail.com>
 # Copyright (C) 2017. Parth Bhatia "TheStrix" <parthbhatia98@gmail.com>
@@ -78,11 +78,3 @@ chmod a+x ~/bin/repo
 
 echo -e "${yellow}Setting up dotfiles${nc}"
 . $HOME/.dotfiles/setup/setupdotfiles.sh
-
-echo -ne "${yellow}Do you wish to source new bashrcadditions (y/n)?${nc}"
-read answer
-if echo -e "$answer" | grep -iq "^y" ;then
-    source ~/.dotfiles/customrcadditions
-else
-    echo
-fi

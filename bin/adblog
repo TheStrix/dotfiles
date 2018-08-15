@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # COLORS
 lightgreen='\e[1;32m'

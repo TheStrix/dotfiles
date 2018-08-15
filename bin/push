@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 function push_impl() {
     adb push $1 /system/$1

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "This script expect /dev/sda as target device"
 echo "Press enter to continue"

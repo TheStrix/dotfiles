@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 process_file() {
 	sed -i "s|/system/bin/linker64\x0|/sbin/linker64\x0\x0\x0\x0\x0\x0\x0|g" $1
 	sed -i "s|/system/bin/linker\x0|/sbin/linker\x0\x0\x0\x0\x0\x0\x0|g" $1

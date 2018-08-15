@@ -1,27 +1,6 @@
-#------------------------------------///
-# CUSTOM BASHRC SHIT
-#------------------------------------///
+#!/usr/bin/env bash
 
-# Colors
-black='\e[0;30m'
-blue='\e[0;34m'
-green='\e[0;32m'
-cyan='\e[0;36m'
-red='\e[0;31m'
-purple='\e[0;35m'
-brown='\e[0;33m'
-lightgray='\e[0;37m'
-darkgray='\e[1;30m'
-lightblue='\e[1;34m'
-lightgreen='\e[1;32m'
-lightcyan='\e[1;36m'
-lightred='\e[1;31m'
-lightpurple='\e[1;35m'
-yellow='\e[1;33m'
-white='\e[1;37m'
-nc='\e[0m'
-
-# Custom dir exports
+# Custom exports
 if [[ "$(mount | grep work)" ]]; then
     export C_WORKDIR="/work";
     export C_ANDROIDWORKDIR="/work/Android";
@@ -34,22 +13,6 @@ export C_PADIR="${C_ANDROIDWORKDIR}/pa";
 export C_SUPERRDIR="${C_ANDROIDTOOLSDIR}/superr";
 export C_OTHERSTUFFDIR="${C_ANDROIDWORKDIR}/otherstuff";
 
-function upinfo () {
-    echo -ne "${yellow}$(hostname) ${lightred}uptime is ${lightblue} \t ";uptime | awk /'up/ {print $3,$4,$5,$6,$7,$8,$9,$10}'
-}
-
-#------------------------------------------////
-# System Information:
-#------------------------------------------////
-clear
-if [[ $(command -v figlet) ]]; then echo -e "${LIGHTGRAY}";figlet "TheStrix"; fi
-echo -ne "${lightred}Today is:\t\t${lightblue}" `date`; echo ""
-echo -e "${lightred}Kernel Information: \t${lightblue}" `uname -smr`
-echo -ne "${cyan}";upinfo;echo -e "${nc}"
-
-#------------------------------------------///
-# EXPORTS:
-#------------------------------------------///
 export EDITOR=nano
 export TZ=Asia/Kolkata
 export KBUILD_BUILD_USER=ParthB
@@ -70,9 +33,7 @@ if [[ -d $C_ANDROIDTOOLSDIR/go ]]; then
     export PATH=$GOBIN:$PATH
 fi
 
-#------------------------------------------////
-# System Aliases/Functions
-#------------------------------------------////
+# Custom aliases
 alias shutdown='sudo shutdown -P now'
 alias yufastboot='fastboot -i 0x2A96'
 alias grepandro='grep -i "\.so\|\.xml\|\.conf\|\.txt\|\.cfg\|\.dat"'
@@ -119,13 +80,6 @@ else
 fi
 alias makeoutkernel='make O=../out ARCH=arm64 CROSS_COMPILE="${aarch64_tc_bin}/aarch64-linux-android-"'
 
-function batteryhistorian() {
-    echo -e "${lightgreen}Running historian...${nc}"
-    echo -e "${yellow}Visit http://localhost:9999${nc}"
-    cd $GOPATH/src/github.com/google/battery-historian
-    go run cmd/battery-historian/battery-historian.go 
-}
-
 # ADB
 function adbrem() { adb root && adb wait-for-$(adb devices | tail -2 | head -1 | cut -f 2 | sed 's/ *$//g') remount; }
 alias adbs='adbrem && adb shell'
@@ -146,52 +100,14 @@ alias fbflboot='fastboot flash boot'
 alias fbflrec='fastboot flash recovery'
 
 # git
-alias git='hub'
+if [[ "$(command -v hub)" ]]; then
+    alias git='hub'
+fi
 alias gtcp='git cherry-pick'
 alias grev='git revert'
 alias glog='git log --pretty=format:"%h - %an : %s"'
 alias gcomgmail='git commit --author="TheStrix <parthbhatia98@gmail.com>"'
 alias gcomlaos='git commit --author="TheStrix <parthbhatia@lineageos.org>"'
-
-# ssh
-function sshtimeout () {
-    eval "$(ssh-agent -t 45m)"
-    ssh-add ~/.ssh/id_rsa
-}
-
-# FORMATS THE TIME
-function format_time() {
-    MINS=$(((${1}-${2})/60))
-    SECS=$(((${1}-${2})%60))
-    if [[ ${MINS} -ge 60 ]]; then
-        HOURS=$((${MINS}/60))
-        MINS=$((${MINS}%60))
-    fi
-
-    if [[ ${HOURS} -eq 1 ]]; then
-        TIME_STRING+="1 HOUR, "
-    elif [[ ${HOURS} -ge 2 ]]; then
-        TIME_STRING+="${HOURS} HOURS, "
-    fi
-
-    if [[ ${MINS} -eq 1 ]]; then
-        TIME_STRING+="1 MINUTE"
-    else
-        TIME_STRING+="${MINS} MINUTES"
-    fi
-
-    if [[ ${SECS} -eq 1 && -n ${HOURS} ]]; then
-        TIME_STRING+=", AND 1 SECOND"
-    elif [[ ${SECS} -eq 1 && -z ${HOURS} ]]; then
-        TIME_STRING+=" AND 1 SECOND"
-    elif [[ ${SECS} -ne 1 && -n ${HOURS} ]]; then
-        TIME_STRING+=", AND ${SECS} SECONDS"
-    elif [[ ${SECS} -ne 1 && -z ${HOURS} ]]; then
-        TIME_STRING+=" AND ${SECS} SECONDS"
-    fi
-
-    echo ${TIME_STRING}
-}
 
 #------------------------------------------////
 # cd-into aliases
@@ -232,6 +148,21 @@ alias superr_sagit='cd ${C_SUPERRDIR}/superr_sagit'
 alias superr_kenzo='cd ${C_SUPERRDIR}/superr_kenzo'
 alias superr_hydrogen='cd ${C_SUPERRDIR}/superr_hydrogen' 
 
-#------------------------------------------////
-# Misc
-#------------------------------------------////
+# Colors
+black='\e[0;30m'
+blue='\e[0;34m'
+green='\e[0;32m'
+cyan='\e[0;36m'
+red='\e[0;31m'
+purple='\e[0;35m'
+brown='\e[0;33m'
+lightgray='\e[0;37m'
+darkgray='\e[1;30m'
+lightblue='\e[1;34m'
+lightgreen='\e[1;32m'
+lightcyan='\e[1;36m'
+lightred='\e[1;31m'
+lightpurple='\e[1;35m'
+yellow='\e[1;33m'
+white='\e[1;37m'
+nc='\e[0m'

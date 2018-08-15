@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 sudo apt-get install git -y
 git config --global user.name "TheStrix"
 git config --global user.email "parthbhatia98@gmail.com"
