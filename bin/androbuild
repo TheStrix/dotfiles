@@ -104,29 +104,29 @@ USAGE
 
 clean_build() {
     echo -e "${yellow}\nINFO: Removing entire out dir. . .\n${nc}"
-    ${MAKE} clobber $@
+    ${MAKE} clobber "$@"
 }
 
 dirty_build() {
     echo -e "${yellow}\nINFO: Executing 'mka installclean'. . .\n${nc}"
     #echo -e "${yellow}\nDeleting $CURDIR/out/target/product/$TARGET/obj/KERNEL_OBJ\n${nc}"
     #rm -rf out/target/product/$TARGET/obj/KERNEL_OBJ
-    ${MAKE} installclean $@
+    ${MAKE} installclean "$@"
 }
 
 build_android() {
     echo -e "${yellow}\nINFO: Build Android tree for $TARGET\n${nc}"
     if [[ "$CURDIR" = "aosp" ]]; then
       if [ "$LOG" = "true" ]; then
-        ${MAKE} otapackage $@ | tee $TARGET.log
+        ${MAKE} otapackage "$@" | tee $TARGET.log
       else
-        ${MAKE} otapackage $@
+        ${MAKE} otapackage "$@"
       fi
     else
       if [ "$LOG" = "true" ]; then
-        ${MAKE} bacon $@ | tee $TARGET.log
+        ${MAKE} bacon "$@" | tee $TARGET.log
       else
-        ${MAKE} bacon $@
+        ${MAKE} bacon "$@"
       fi
     fi
 }
@@ -134,9 +134,9 @@ build_android() {
 build_bootimg() {
     echo -e "${yellow}\nINFO: Build bootimage for $TARGET\n${nc}"
     if [ "$LOG" = "true" ]; then
-      ${MAKE} bootimage $@ | tee $TARGET.log
+      ${MAKE} bootimage "$@" | tee $TARGET.log
     else
-      ${MAKE} bootimage $@
+      ${MAKE} bootimage "$@"
     fi
 }
 
@@ -148,36 +148,36 @@ build_recoveryimg() {
     echo -e "${lightpurple}Setting TW_DEVICE_VERSION=$TW_DEVICE_VERSION${nc}"
     export TW_DEVICE_VERSION=$TW_DEVICE_VERSION
     if [ "$LOG" = "true" ]; then
-      ${MAKE} recoveryimage adbd $@ | tee $TARGET.log
+      ${MAKE} recoveryimage adbd "$@" | tee $TARGET.log
     else
-      ${MAKE} recoveryimage adbd $@
+      ${MAKE} recoveryimage adbd "$@"
     fi
 }
 
 build_sysimg() {
     echo -e "${yellow}\nINFO: Build systemimage for $TARGET\n${nc}"
     if [ "$LOG" = "true" ]; then
-      ${MAKE} systemimage $@ | tee $TARGET.log
+      ${MAKE} systemimage "$@" | tee $TARGET.log
     else
-      ${MAKE} systemimage $@
+      ${MAKE} systemimage "$@"
     fi
 }
 
 build_usrimg() {
     echo -e "${yellow}\nINFO: Build userdataimage for $TARGET\n${nc}"
     if [ "$LOG" = "true" ]; then
-      ${MAKE} userdataimage $@ | tee $TARGET.log
+      ${MAKE} userdataimage "$@" | tee $TARGET.log
     else
-      ${MAKE} userdataimage $@
+      ${MAKE} userdataimage "$@"
     fi
 }
 
 build_module() {
     echo -e "${yellow}\nINFO: Build $MODULE for $TARGET\n${nc}"
     if [ "$LOG" = "true" ]; then
-      ${MAKE} $MODULE $@ | tee $TARGET.log
+      ${MAKE} $MODULE "$@" | tee $TARGET.log
     else
-      ${MAKE} $MODULE $@
+      ${MAKE} $MODULE "$@"
     fi
 }
 
