@@ -118,9 +118,9 @@ build_android() {
     echo -e "${yellow}\nINFO: Build Android tree for $TARGET\n${nc}"
     if [[ "$CURDIR" = "aosp" ]]; then
       if [ "$LOG" = "true" ]; then
-        ${MAKE}"$@" | tee $TARGET.log
+        eval "${MAKE}"$@"" | tee $TARGET.log
       else
-        ${MAKE}"$@"
+        eval "${MAKE}"$@""
       fi
     else
       if [ "$LOG" = "true" ]; then
