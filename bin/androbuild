@@ -118,9 +118,9 @@ build_android() {
     echo -e "${yellow}\nINFO: Build Android tree for $TARGET\n${nc}"
     if [[ "$CURDIR" = "aosp" ]]; then
       if [ "$LOG" = "true" ]; then
-        ${MAKE} otapackage"$@" | tee $TARGET.log
+        ${MAKE}"$@" | tee $TARGET.log
       else
-        ${MAKE} otapackage"$@"
+        ${MAKE}"$@"
       fi
     else
       if [ "$LOG" = "true" ]; then
@@ -199,81 +199,19 @@ update_api() {
     fi
 }
 
-# CCACHE
-if [ "$(mount | grep work)" ]; then
-  KENZOCCACHE=/work/Android/.kenzoccache/
-  HYDROGENCCACHE=/work/Android/.hydrogenccache/
-  SAGITCCACHE=/work/Android/.sagitccache/
-  BERKELEYCCACHE=/work/Android/.berkeleyccache/
-else
-  KENZOCCACHE=$HOME/.kenzoccache/
-  HYDROGENCCACHE=$HOME/.hydrogenccache/
-  SAGITCCACHE=$HOME/.sagitccache/
-  BERKELEYCCACHE=$HOME/.berkeleyccache/
-fi
-
-
-setup_kenzoccache() {
-  export CCACHE_DIR=$KENZOCCACHE
+setup_ccache() {
+  export CCACHE_DIR=${CCACHEDIR}
   export USE_CCACHE=1
 }
 
-setup_hydrogenccache() {
-  export CCACHE_DIR=$HYDROGENCCACHE
-  export USE_CCACHE=1
-}
-
-setup_sagitccache() {
-  export CCACHE_DIR=$SAGITCCACHE
-  export USE_CCACHE=1
-}
-
-setup_berkeleyccache() {
-  export CCACHE_DIR=$BERKELEYCCACHE
-  export USE_CCACHE=1
-}
-
-delete_kenzoccache() {
-    export CCACHE_DIR=$KENZOCCACHE
+delete_ccache() {
+    export CCACHE_DIR=${CCACHEDIR}
     ccache -C
 }
 
-delete_hydrogenccache() {
-    export CCACHE_DIR=$HYDROGENCCACHE
-    ccache -C
-}
-
-delete_sagitccache() {
-  export CCACHE_DIR=$SAGITCCACHE
-  ccache -C
-}
-
-delete_berkeleyccache() {
-  export CCACHE_DIR=$BERKELEYCCACHE
-  ccache -C
-}
-
-create_kenzoccache() {
-    echo -e "${lightgreen}\nINFO: Setting kenzo CCACHE with 25 GB\n${nc}"
-    setup_kenzoccache
-    ccache -M 25G
-}
-
-create_hydrogenccache() {
-    echo -e "${lightgreen}\nINFO: Setting hydrogen CCACHE with 25 GB\n${nc}"
-    setup_hydrogenccache
-    ccache -M 25G
-}
-
-create_sagitccache() {
-  echo -e "${lightgreen}\nINFO: Setting sagit CCACHE with 25 GB\n${nc}"
-    setup_sagitccache
-    ccache -M 25G
-}
-
-create_berkeleyccache() {
-  echo -e "${lightgreen}\nINFO: Setting berkeley CCACHE with 25 GB\n${nc}"
-    setup_berkeleyccache
+create_ccache() {
+    echo -e "${lightgreen}\nINFO: Setting ${TARGET} CCACHE with 25 GB\n${nc}"
+    setup_ccache
     ccache -M 25G
 }
 
@@ -356,78 +294,21 @@ if [ -n "$DEFCONFIG" ]; then
     CMD+=" KERNEL_DEFCONFIG=$DEFCONFIG"
 fi
 
+CCACHEDIR="${C_ANDROIDWORKDIR}/.ccache_${TARGET}"
 if [[ "$DELTE_CCACHE" = "true" ]]; then
-  if [[ "$TARGET" = "kenzo" ]];
-  then
-    echo -e "${lightgreen}Clearing kenzo CCACHE dir $KENZOCCACHE${nc}"
-    delete_kenzoccache
-  fi
-  if [[ "$TARGET" = "hydrogen" ]];
-  then
-    echo -e "${lightgreen}Clearing hydrogen CCACHE dir $HYDROGENCCACHE${nc}"
-    delete_hydrogenccache
-  fi
-  if [[ "$TARGET" = "sagit" ]]; then
-    echo -e "${lightgreen}Clearing sagit CCACHE dir $SAGITCCACHE${nc}"
-    delete_sagitccache
-  fi
-  if [[ "$TARGET" = "berkeley" ]]; then
-    echo -e "${lightgreen}Clearing berkeley CCACHE dir $BERKELEYCCACHE${nc}"
-    delete_berkeleyccache
-  fi
+  echo -e "${lightgreen}Clearing ${TARGET} CCACHE dir ${CCACHEDIR}.${nc}"
+  delete_ccache
 fi
 
-if [[ "$TARGET" = "kenzo" ]]; then
-  if [[ ! -e $KENZOCCACHE ]]; then
-    echo -e "${lightgreen}Kenzo CCACHE dir $KENZOCCACHE not found... Creating and setting it up!${nc}"
-    mkdir $KENZOCCACHE
-    create_kenzoccache
-  fi
+if [[ ! -e ${CCACHEDIR} ]]; then
+  echo -e "${lightgreen}${TARGET} CCACHE dir ${CCACHEDIR} not found... Creating and setting it up!${nc}"
+  mkdir ${CCACHEDIR}
+  create_ccache
 fi
 
-if [[ "$TARGET" = "hydrogen" ]]; then
-  if [[ ! -e $HYDROGENCCACHE ]]; then
-    echo -e "${lightgreen}hydrogen CCACHE dir $HYDROGENCCACHE not found... Creating and setting it up!${nc}"
-    mkdir $HYDROGENCCACHE
-    create_hydrogenccache
-  fi
-fi
-
-if [[ "$TARGET" = "sagit" ]]; then
-  if [[ ! -e $SAGITCCACHE ]]; then
-    echo -e "${lightgreen}sagit CCACHE dir $SAGITCCACHE not found... Creating and setting it up!${nc}"
-    mkdir $SAGITCCACHE
-    create_sagitccache
-  fi
-fi
-
-if [[ "$TARGET" = "berkeley" ]]; then
-  if [[ ! -e $BERKELEYCCACHE ]]; then
-    echo -e "${lightgreen}berkeley CCACHE dir $BERKELEYCCACHE not found... Creating and setting it up!${nc}"
-    mkdir $BERKELEYCCACHE
-    create_berkeleyccache
-  fi
-fi
-
-if [ "$CCACHE" = "true" ]; then
-  if [[ "$TARGET" = "kenzo" ]];
-  then
-    echo -e "${lightgreen}Setting up kenzo CCACHE dir $KENZOCCACHE${nc}"
-    setup_kenzoccache
-  fi
-  if [[ "$TARGET" = "hydrogen" ]];
-  then
-    echo -e "${lightgreen}Setting up hydrogen CCACHE dir $HYDROGENCCACHE${nc}"
-    setup_hydrogenccache
-  fi
-  if [[ "$TARGET" = "sagit" ]]; then
-    echo -e "${lightgreen}Setting up sagit CCACHE dir $SAGITCCACHE${nc}"
-    setup_sagitccache
-  fi
-  if [[ "$TARGET" = "berkeley" ]]; then
-    echo -e "${lightgreen}Setting up berkeley CCACHE dir $BERKELEYCCACHE${nc}"
-    setup_berkeleyccache
-  fi
+if [[ "${CCACHE}" = "true" ]]; then
+  echo -e "${lightgreen}Setting up ${TARGET} CCACHE dir $CCACHEDIR${nc}"
+  setup_ccache
 fi
 
 venv
@@ -442,7 +323,7 @@ lunch aicp_$TARGET-$VARIANT
 elif [[ "$CURDIR" = pa* ]]; then
 lunch pa_$TARGET-$VARIANT
 else
-lunch aosp_$TARGET-$VARIANT
+lunch $TARGET-$VARIANT
 fi
 
 if [[ "$(command -v 'mka')" ]]; then
