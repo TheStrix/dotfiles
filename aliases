@@ -20,10 +20,10 @@ export USE_CCACHE=1
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
 export PATH=~/bin:$HOME/.dotfiles/bin:${C_WORKDIR}/bin:${C_ANDROIDTOOLSDIR}/android-studio/Sdk/platform-tools:$PATH
 
-if [[ $HOSTNAME = "build3.de.xda-developers.com" ]]; then
-    export PATH=~/install/zsh/bin:$PATH
-    export SHELL=`which zsh`
-    [ -z "$ZSH_VERSION" ] && exec "$SHELL" -l
+if [[ $HOSTNAME = "build3.de.xda-developers.com" && ! $(command -v zsh) ]]; then
+    if [[ $(which zsh) != $SHELL ]]; then
+        echo -e "${lightred}ZSH installed but not set as default shell...\nSet \$PATH, \$SHELL in ~/.profile.${nc}"
+    fi
 fi
 
 # Golang
