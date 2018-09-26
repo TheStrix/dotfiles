@@ -414,7 +414,6 @@ if [[ "$UPLOAD" = "true" ]]; then
         gdrive upload --parent $upldir ${OUT}/system.img
         gdrive upload --parent $upldir ${OUT}/vendor.img
         gdrive upload --parent $upldir ${OUT}/userdata.img
-        gdrive upload --parent $upldir ${OUT}/cache.img
         gdrive upload --parent $upldir ${OUT}/boot.img
       fi
     else
