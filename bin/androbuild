@@ -366,8 +366,10 @@ END="$(date +%s)"
 format_time ${END} ${START}
 
 # Kill jack if still running
-if [[ ! -z $(prebuilts/sdk/tools/jack-admin list-server) ]]; then
-	prebuilts/sdk/tools/jack-admin kill-server
+if [[ -x prebuilts/sdk/tools/jack-admin ]]; then
+  if [[ ! -z $(prebuilts/sdk/tools/jack-admin list-server) ]]; then
+  	prebuilts/sdk/tools/jack-admin kill-server
+  fi
 fi
 
 if [[ -d "/tmp/venv" ]]; then
