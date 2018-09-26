@@ -405,8 +405,18 @@ if [[ "$UPLOAD" = "true" ]]; then
         echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
         gdrive upload ${OUT}/pa_*.zip
       fi
+    elif [[ "$CURDIR" = aosp* ]]; then
+      if [[ "$TARGET" = "hikey960" -o "$TARGET" = "hikey960_tv" ]]; then
+        upldir=$(gdrive mkdir --parent 1uOl8zXlX8xNm1cFaoVxGcoISo-aN4erx "images_$(date -u +%Y%m%d-%H:%M)" | awk '{print $2}')
+        echo -e "${yellow}Uploading compiled images to dir images_$(date -u +%Y%m%d-%H:%M): $upldir${nc}"
+        gdrive upload --parent $upldir ${OUT}/system.img
+        gdrive upload --parent $upldir ${OUT}/vendor.img
+        gdrive upload --parent $upldir ${OUT}/userdata.img
+        gdrive upload --parent $upldir ${OUT}/cache.img
+        gdrive upload --parent $upldir ${OUT}/boot.img
+      fi
     else
-      echo -e "${yellow}Upload configured only for LineageOS & PA${nc}"
+      echo -e "${yellow}Upload configured only for AOSP, LineageOS & PA${nc}"
     fi
   fi
 fi

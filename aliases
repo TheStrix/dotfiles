@@ -115,6 +115,8 @@ alias gcomlaos='git commit --author="TheStrix <parthbhatia@lineageos.org>"'
 alias dotfiles='cd ~/.dotfiles'
 alias laos='cd ${C_LINEAGEDIR}'
 alias pa='cd ${C_PADIR}'
+alias omni='cd ${C_ANDROIDWORKDIR}/omni'
+alias aosp='cd ${C_ANDROIDWORKDIR}/aosp'
 
 # LAOS
 alias sagitlaos_d='cd ${C_LINEAGEDIR}/device/xiaomi/sagit'
