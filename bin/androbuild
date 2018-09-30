@@ -383,20 +383,18 @@ if [[ "$UPLOAD" = "true" ]]; then
     gdrive upload --parent 1GAKzFhwEDC2LM-_iveXGMBUYoooQ1ud2 ${OUT}/boot.img
   else
     if [[ "$CURDIR" = lineage* ]]; then
+      echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
       if [[ "$TARGET" = "kenzo" ]]; then
-        echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
         gdrive upload --parent 0B9JxQ_RHblHkZWpaejlPNUtjVEk ${OUT}/lineage-*.zip
       elif [[ "$TARGET" = "hydrogen" ]]; then
-        echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
         gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ${OUT}/lineage-*.zip
       elif [[ "$TARGET" = "sagit" ]]; then
-        echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
         gdrive upload --parent 0B9JxQ_RHblHkemswTVRkTERYdXM ${OUT}/lineage-*.zip
       elif [[ "$TARGET" = "berkeley" ]]; then
-        echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
         gdrive upload --parent 1ZguqcdEaU5DeOCryvF61bIni_nRn_HJR ${OUT}/lineage-*.zip
+      elif [[ "$TARGET" = "beryllium" ]]; then
+        gdrive upload --parent 1mXQPW9nLRgUHhd3A4bAGigi1NP_-0Oto ${OUT}/lineage-*.zip
       else
-        echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
         gdrive upload ${OUT}/lineage-*.zip
       fi
     elif [[ "$CURDIR" = pa* ]]; then
