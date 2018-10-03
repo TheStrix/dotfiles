@@ -17,6 +17,7 @@ nc='\e[0m'
 # Make temp work dir
 TMPDIR=$(mktemp -d)
 mkdir $TMPDIR/dexout
+HOST="$(uname)"
 
 if [ "$#" -lt 1 ]; then
     echo "You have to specify at least one app to deodex"
@@ -43,35 +44,69 @@ if [[ -z $BAKSMALIJAR || -z $SMALIJAR ]]; then
         exit 1
     fi
 fi
+if [ -z "$VDEXEXTRACTOR" ]; then
+    if [[ -f "$C_ANDROIDTOOLSDIR"/vdexExtractor/bin/vdexExtractor ]]; then
+        export VDEXEXTRACTOR="$C_ANDROIDTOOLSDIR"/vdexExtractor/bin/vdexExtractor
+    elif [[ -f $C_PADIR/vendor/blobscript/"$HOST"/vdexExtractor ]]; then
+        export VDEXEXTRACTOR="$C_PADIR"/vendor/blobscript/"$HOST"/vdexExtractor
+    elif [[ -f $C_LINEAGEDIR/vendor/lineage/build/tools/"$HOST"/vdexExtractor ]]; then
+        export VDEXEXTRACTOR="$C_LINEAGEDIR"/vendor/lineage/build/tools/"$HOST"/vdexExtractor
+    else
+        echo -e "${lightred}vdexExtractor not found!${nc}"
+        exit 1
+    fi
+fi
+if [[ -z "$CDEXCONVERTER" ]]; then
+    if [[ -f $(find "$C_ANDROIDTOOLSDIR"/vdexExtractor -name compact_dex_converter) ]]; then
+        export CDEXCONVERTER=$(find "$C_ANDROIDTOOLSDIR"/vdexExtractor -name compact_dex_converter)
+    else
+        echo -e "${lightred}compact_dex_converter not found!${nc}"
+        exit 1
+    fi
+fi
 
 # Process
 BOOTOAT=$(readlink -f framework/$device_arch/boot.oat)
 
 for module in $@; do
     FPATH=$(readlink -f $module)
+    FNAME=$(basename $module | cut -d. -f1)
     if [[ -z $(unzip -l $FPATH | grep classes.dex) ]]; then
         # Detect apk or jar
         if [[ $module = *.apk ]]; then
-            APPDIR=$(find * -type d -name "$(basename $module .apk)")
+            APPDIR=$(find * -type d -name "$FNAME")
             OAT=$(readlink -f $APPDIR/oat/$device_arch)
-            DEX=$(readlink -f $OAT/$(basename $module .apk).odex)
         elif [[ $module = *.jar ]]; then
             OAT=$(readlink -f framework/oat/$device_arch)
-            DEX=$(readlink -f $OAT/$(basename $module .jar).odex)
         fi
+        DEX=$(readlink -f $OAT/$FNAME.odex)
+        VDEX=$(readlink -f $OAT/$FNAME.vdex)
 
         # Make backup
         cp $FPATH ${FPATH}.oldbak
 
-        # Assemble classes.dex
-        java -jar "$BAKSMALIJAR" deodex -o "$TMPDIR/dexout" -b "$BOOTOAT" -d "$OAT" "$DEX"
-        java -jar "$SMALIJAR" assemble "$TMPDIR/dexout" -o "$TMPDIR/classes.dex"
+        if [[ -f $VDEX ]]; then
+            echo -e "${lightcyan}Deodexing using vdexExtractor${nc}"
+            # Use vdexExtractor for .dex if .vdex is present
+            "$VDEXEXTRACTOR" -o "$TMPDIR" -i $VDEX &> /dev/null
+            if [[ -f $(readlink -f "$TMPDIR/${FNAME}_classes.cdex") ]]; then
+                "$CDEXCONVERTER" "$TMPDIR/${FNAME}_classes.cdex" &> /dev/null
+                mv "$TMPDIR/${FNAME}_classes.cdex.new" "$TMPDIR/classes.dex"
+            else
+                mv "$TMPDIR/${FNAME}_classes.dex" "$TMPDIR/classes.dex"
+            fi
+        else
+            echo -e "${lightcyan}Deodexing using smali/baksmali${nc}"
+            # Use baksmali/smali for dex
+            java -jar "$BAKSMALIJAR" deodex -o "$TMPDIR/dexout" -b "$BOOTOAT" -d "$OAT" "$DEX"
+            java -jar "$SMALIJAR" assemble "$TMPDIR/dexout" -o "$TMPDIR/classes.dex"
+            rm -rf $TMPDIR/dexout/*
+        fi
 
         # Pack deodexed module
         zip -gjq $FPATH $TMPDIR/classes.dex
 
         # Cleanup
-        rm -rf $TMPDIR/dexout/*
         rm $TMPDIR/classes.dex
 
         echo -e "${lightgreen}Deodexed: $FPATH${nc}"
