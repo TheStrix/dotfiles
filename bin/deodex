@@ -70,7 +70,8 @@ BOOTOAT=$(readlink -f framework/$device_arch/boot.oat)
 
 for module in $@; do
     FPATH=$(readlink -f $module)
-    FNAME=$(basename $module | cut -d. -f1)
+    FILE=$(basename "$FPATH")
+    FNAME=$(echo "$FILE" | sed -e 's/\.[^.]*$//')
     if [[ -z $(unzip -l $FPATH | grep classes.dex) ]]; then
         # Detect apk or jar
         if [[ $module = *.apk ]]; then
