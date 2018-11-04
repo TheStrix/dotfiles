@@ -19,6 +19,13 @@ if [[ ! -d framework ]]; then
     exit 1
 fi
 
+if [[ $1 == "--all" || $1 == "-a" ]]; then
+    modules=$(find . \( -iname '*.jar' -o -iname '*.apk' \) | sort)
+    SKIPBACKUP=true
+else
+    modules="$@"
+fi
+
 # Detect arch
 if [ -d framework/arm64 ]; then
     device_arch=arm64
@@ -65,8 +72,7 @@ fi
 
 # Process
 BOOTOAT=$(readlink -f framework/$device_arch/boot.oat)
-
-for module in $@; do
+for module in $modules; do
     FPATH=$(readlink -f $module)
     FILE=$(basename "$FPATH")
     FNAME=$(echo "$FILE" | sed -e 's/\.[^.]*$//')
@@ -74,27 +80,35 @@ for module in $@; do
         # Detect apk or jar
         if [[ $module = *.apk ]]; then
             APPDIR=$(find * -type d -name "$FNAME")
-            OAT=$(readlink -f $APPDIR/oat/$device_arch)
-        elif [[ $module = *.jar ]]; then
-            if [[ ! -z $(ls framework/oat/$device_arch | grep $FNAME) ]]; then
-                OAT=$(readlink -f framework/oat/$device_arch)
-            elif [[ ! -z $(ls framework | grep boot-$FNAME) ]]; then
-                echo -e "${darkgray}Boot jar detected...${nc}"
-                BOOTJAR=true
+            if ls $APPDIR/oat/$device_arch/$FNAME* 1> /dev/null 2>&1; then
+                OAT=$(readlink -f $APPDIR/oat/$device_arch)
             else
-                echo -e "${lightred}Couldn't find .odex or .vdex for following jar: $FILE"
-                exit 1
+                echo -e "${lightred}Error: Couldn't find .odex or .vdex for following app: $FILE"
+                continue
+            fi
+        elif [[ $module = *.jar ]]; then
+            if ls framework/oat/$device_arch/$FNAME* 1> /dev/null 2>&1; then
+                OAT=$(readlink -f framework/oat/$device_arch)
+                BOOTJAR="false"
+            elif ls framework/boot-$FNAME* 1> /dev/null 2>&1; then
+                echo -e "${darkgray}Boot jar detected...${nc}"
+                BOOTJAR="true"
+            else
+                echo -e "${lightred}Error: Couldn't find .odex or .vdex for following jar: $FILE"
+                continue
             fi
         fi
         DEX=$(readlink -f $OAT/$FNAME.odex)
         VDEX=$(readlink -f $OAT/$FNAME.vdex)
-        if [[ $BOOTJAR ]]; then
+        if [[ $BOOTJAR == "true" ]]; then
             VDEX=$(readlink -f framework/boot-$FNAME.vdex)
             FNAME="boot-${FNAME}"
         fi
 
         # Make backup
-        cp $FPATH ${FPATH}.oldbak
+        if [[ ! $SKIPBACKUP ]]; then
+            cp $FPATH ${FPATH}.oldbak
+        fi
 
         if [[ -f $VDEX ]]; then
             echo -e "${lightcyan}Deodexing using vdexExtractor${nc}"
