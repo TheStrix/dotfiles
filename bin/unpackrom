@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+
+# source functions
+source ~/.dotfiles/functions
+
+usage() {
+    cat <<USAGE
+Usage:
+    To unpack:
+        bash $0 <ROM_FILE_PATH> <OUTPUT_DIR_PATH>
+
+OPTIONS:
+    -h, --help
+        Display this help message
+
+USAGE
+}
+
+CURR_DIR=$(pwd);
+
+# Setup getopt.
+long_opts="help"
+getopt_cmd=$(getopt -o h --long "$long_opts" \
+            -n $(basename $0) -- "$@") || \
+            { echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
+
+eval set -- "$getopt_cmd"
+
+while true; do
+    case "$1" in
+        -h|--help) usage; exit 0;;
+        --) shift; break;;
+    esac
+    shift
+done
+
+# Mandatory argument
+if [ $# -eq 1 ]; then
+    echo -e "${red}\nERROR: Missing mandatory argument: ROM_FILE_PATH or OUTPUT_DIR_PATH\n${nc}"
+    usage
+    exit 1
+fi
+if [ $# -gt 2 ]; then
+    echo -e "${red}\nERROR: Extra inputs. Need ROM_FILE_PATH & OUTPUT_DIR_PATH only\n${nc}"
+    usage
+    exit 1
+fi
+
+ROM_PATH="${1}"
+OUTPUT_DIR="${2}"
+ROM_FILE=$(basename $ROM_PATH)
+UNZIP_DIR="$OUTPUT_DIR/$(echo "$ROM_FILE" | sed -e 's/\.[^.]*$//')"
+
+# Unzip ROM file
+if [[ $ROM_FILE = *.zip ]]; then
+	mkdir -p $UNZIP_DIR
+	if [[ $(unzip -l $ROM_PATH | grep payload.bin) ]]; then
+		echo -e "${yellow}\nA/B ROM detected. Extracting payload.bin...${nc}"
+		cd $UNZIP_DIR
+		python2 $C_ANDROIDTOOLSDIR/extract_android_ota_payload/extract_android_ota_payload.py $ROM_PATH
+		for p in system vendor modem boot; do
+			mv $p.img $OUTPUT_DIR
+		done
+	else
+		echo -e "${yellow}\nUnzipping...${nc}"
+		unzip -q ${ROM_PATH} -d ${UNZIP_DIR}
+		cd $UNZIP_DIR
+		# System and vendor image
+		if [[ $(ls | grep vendor.new.dat) ]]; then
+			PARTITIONS="system vendor"
+		else
+			PARTITIONS="system"
+		fi
+		for p in $PARTITIONS; do
+			if [[ -f $p.new.dat.br ]]; then
+				brotli -d $p.new.dat.br
+			fi
+			sdat2img $p.{transfer.list,new.dat,img}
+			mv $p.img $OUTPUT_DIR
+		done
+		# Modem image
+		cp firmware-update/modem.img $OUTPUT_DIR || cp firmware-update/NON-HLOS.bin $OUTPUT_DIR/modem.img
+		# Boot image
+		cp boot.img $OUTPUT_DIR
+	fi
+elif [[ $ROM_FILE = *.tar.gz  ]]; then
+	mkdir -p $UNZIP_DIR
+	echo -e "TAR WIP"
+	exit 1
+else
+	echo -e "${lightred}\nError: Unknown file format: $ROM_PATH\nOnly zip & tar.gz are supported.\n${nc}"
+fi
+
+cd $OUTPUT_DIR
+if [[ $(ls | grep vendor.img) ]]; then
+	PARTITIONS="system vendor"
+else
+	PARTITIONS="system"
+fi
+for p in $PARTITIONS; do
+	mkdir "${p}"
+	mkdir "${p}_mount"
+	echo -e "${yellow}\nMounting $p.img to ${p}_mount${nc}"
+	sudo mount -t ext4 -o loop $p.img ${p}_mount
+	sudo chown $(whoami) ${p}_mount/ -R
+	echo -e "${yellow}\nCopying ${p}_mount/* content to $p${nc}"
+	cp -rf ${p}_mount/* ${p}/
+	echo -e "${yellow}\nUnmounting $p${nc}"
+	sudo umount ${p}_mount
+	rm -rf ${p}_mount
+	rm $p.img
+done
+
+# Unpack modem
+mkdir modem
+sudo mount -t vfat -o loop modem.img modem/
+cp modem/verinfo/ver_info.txt $OUTPUT_DIR
+sudo umount modem
+rm modem.img
+
+# Unpack boot.img
+echo -e "${yellow}\nUnpacking boot.img...$p${nc}"
+bootaik boot.img
+
+# Create all_files.txt
+echo -e "${yellow}\nCreating all_files.txt...${nc}"
+find system/ -type f -exec echo {} >> allfiles.txt \;
+find vendor/ -type f -exec echo {} >> allfiles.txt \;
+find bootimg/ -type f -exec echo {} >> allfiles.txt \;
+find modem/ -type f -exec echo {} >> allfiles.txt \;
+sort allfiles.txt > all_files.txt
+
+# Create vendor symlink in system (this is for my shit)
+if [[ -d vendor ]]; then
+	if [[ -d system/system ]]; then
+		SYSTEM_AS_ROOT="true"
+		cd system/system
+		ln -sf ../../vendor vendor
+		cd ../../
+	else
+		cd system
+		ln -sf ../vendor vendor
+	fi
+fi
+
+# Cleanup
+rm allfiles.txt
+rm -rf $UNZIP_DIR
+rm -rf modem
+
+# Move ROM file to unpacked dir
+mv $ROM_PATH $OUTPUT_DIR

@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 
-# Colors
-lightgreen='\e[1;32m'
-lightcyan='\e[1;36m'
-lightred='\e[1;31m'
-nc='\e[0m'
+# source functions
+source ~/.dotfiles/functions
 
 usage() {
     cat <<USAGE
@@ -31,11 +28,8 @@ USAGE
 }
 
 # osm0sis's AIK path
-if [[ -d $C_SUPERRDIR/tools/boot/AIK ]]; then
-    AIK=$C_SUPERRDIR/tools/boot/AIK;
-    echo -e "${lightcyan}\n Found AIK at $AIK\n${nc}";
-elif [[ -d $C_ANDROIDWORKDIR/AIK ]]; then
-    AIK=$C_ANDROIDWORKDIR/AIK;
+if [[ -d $C_ANDROIDTOOLSDIR/aik ]]; then
+    AIK=$C_ANDROIDTOOLSDIR/aik;
     echo -e "${lightcyan}\n Found AIK at $AIK\n${nc}";
 else
     echo -e "${lightred}\n ERROR: AIK not found!\n${nc}";
@@ -68,6 +62,9 @@ boot_unpack() {
     sudo rm -rf $OUTPUT_DIR_PATH/ramdisk $OUTPUT_DIR_PATH/split_img;
     sudo mv $AIK/ramdisk $OUTPUT_DIR_PATH;
     mv $AIK/split_img $OUTPUT_DIR_PATH;
+
+    # Change file perms
+    sudo chown -R $(whoami) $OUTPUT_DIR_PATH;
 
     echo -e "${lightgreen}\nExtracted to $OUTPUT_DIR_PATH\n${nc}";
 }

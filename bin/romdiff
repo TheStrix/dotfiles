@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (C) 2017. Parth Bhatia (TheStrix) <parthbhatia98@gmail.com>
+# Copyright (C) 2017-2018. Parth Bhatia (TheStrix) <parthbhatia98@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,32 +15,8 @@
 # limitations under the License.
 #
 
-# Colors
-black='\e[0;30m'
-blue='\e[0;34m'
-green='\e[0;32m'
-cyan='\e[0;36m'
-red='\e[0;31m'
-purple='\e[0;35m'
-brown='\e[0;33m'
-lightgray='\e[0;37m'
-darkgray='\e[1;30m'
-lightblue='\e[1;34m'
-lightgreen='\e[1;32m'
-lightcyan='\e[1;36m'
-lightred='\e[1;31m'
-lightpurple='\e[1;35m'
-yellow='\e[1;33m'
-white='\e[1;37m'
-nc='\e[0m'
-
-# Source local functions
-if [[ -f ~/.dotfiles/functions ]]; then
-	source ~/.dotfiles/functions
-else
-	echo -e "${lightred}functions file not found, present in TheStrix's dotfiles.${nc}"
-	exit 1
-fi
+# source functions
+source ~/.dotfiles/functions
 
 grepdate() {
 	UTCDATE=$(grep "ro.build.date.utc" $1 | awk -F '=' '{print $2}')
@@ -50,7 +26,7 @@ usage() {
 	cat <<USAGE
 
 Usage:
-		bash $0 <OLD_SUPERR_DIR> <NEW_ROM_FILE>
+		bash $0 <OLD_DUMP_DIR> <NEW_ROM_FILE>
 
 Examples: 	
 
@@ -83,64 +59,64 @@ if [ $# -lt 2 ]; then
     exit 1
 fi
 if [ $# -gt 2 ]; then
-    echo -e "${red}\nERROR: Extra inputs. Need <OLD_SUPERR_DIR> & <NEW_ROM_FILE> only\n${nc}"
+    echo -e "${red}\nERROR: Extra inputs. Need <OLD_DUMP_DIR> & <NEW_ROM_FILE> only\n${nc}"
     usage
     exit 1
 fi
 
-OLD_SUPERR_DIR=$1
+OLD_DUMP_DIR=$1
 NEW_ROM_FILE=$2
 
 # Append _old to dir
-cd $C_SUPERRDIR
-mv $OLD_SUPERR_DIR ${OLD_SUPERR_DIR}_old
+cd $C_ANDROIDWORKDIR/dumps
+mv $OLD_DUMP_DIR ${OLD_DUMP_DIR}_old
 
 # Make a new superr dir with the new ROM file in it
-mkdir $OLD_SUPERR_DIR
+mkdir $OLD_DUMP_DIR
 
 if [[ $NEW_ROM_FILE == *.zip ]]; then
 	echo -e "${lightgreen}ZIP: $NEW_ROM_FILE${nc}"
-	echo -e "${lightgreen}Moving zip file to $OLD_SUPERR_DIR${nc}"
-	mv $NEW_ROM_FILE $OLD_SUPERR_DIR
+	echo -e "${lightgreen}Moving zip file to $OLD_DUMP_DIR${nc}"
+	mv $NEW_ROM_FILE $OLD_DUMP_DIR
 elif [[ $NEW_ROM_FILE == *.tgz ]]; then
 	echo -e "${lightgreen}TGZ: $NEW_ROM_FILE${nc}"
 	mkdir -p $HOME/.reallytemp
 	echo -e "${lightcyan}Extracting tgz firmware file${nc}"
 	tar -xzvf $NEW_ROM_FILE -C $HOME/.reallytemp
-	echo -e "${lightcyan}Copying system.img to $OLD_SUPERR_DIR${nc}"
-	cp $HOME/.reallytemp/*/images/system.img $OLD_SUPERR_DIR
-	echo -e "${lightcyan}Copying boot.img to $OLD_SUPERR_DIR${nc}"
-	cp $HOME/.reallytemp/*/images/boot.img $OLD_SUPERR_DIR
+	echo -e "${lightcyan}Copying system.img to $OLD_DUMP_DIR${nc}"
+	cp $HOME/.reallytemp/*/images/system.img $OLD_DUMP_DIR
+	echo -e "${lightcyan}Copying boot.img to $OLD_DUMP_DIR${nc}"
+	cp $HOME/.reallytemp/*/images/boot.img $OLD_DUMP_DIR
 	rm -rf $HOME/.reallytemp
-	echo -e "${lightgreen}Moving tgz file to $OLD_SUPERR_DIR${nc}"
-	mv $NEW_ROM_FILE $OLD_SUPERR_DIR
+	echo -e "${lightgreen}Moving tgz file to $OLD_DUMP_DIR${nc}"
+	mv $NEW_ROM_FILE $OLD_DUMP_DIR
 else
 	echo -e "${lightred}Only zip/tgz are supported${nc}"
 	exit 1
 fi
 
-# Launch superr and user has to manually unpack it here
-cd ${C_SUPERRDIR} && ./superr
+# Unpack new ROM
+unpackrom 
 
-echo -e "${yellow}Deleting system.img from $OLD_SUPERR_DIR as it's extracted${nc}"
-rm $OLD_SUPERR_DIR/system.img
+echo -e "${yellow}Deleting system.img from $OLD_DUMP_DIR as it's extracted${nc}"
+rm $OLD_DUMP_DIR/system.img
 
 echo -e "${lightgreen}Unpacking boot.img to 'bootimg'${nc}"
-bootaik $OLD_SUPERR_DIR/boot.img $OLD_SUPERR_DIR/bootimg
-sudo chown -R $USER:$USER $OLD_SUPERR_DIR/bootimg
+bootaik $OLD_DUMP_DIR/boot.img $OLD_DUMP_DIR/bootimg
+sudo chown -R $USER:$USER $OLD_DUMP_DIR/bootimg
 
-if [[ -n $(grep "miui" $OLD_SUPERR_DIR/system/build.prop) ]]; then
+if [[ -n $(grep "miui" $OLD_DUMP_DIR/system/build.prop) ]]; then
 	# Store MIUI versions to append if diff file names
-	OLD_VERSION=$(grep "ro.build.version.incremental" ${OLD_SUPERR_DIR}_old/system/build.prop | awk -F '=' '{print $2}')
+	OLD_VERSION=$(grep "ro.build.version.incremental" ${OLD_DUMP_DIR}_old/system/build.prop | awk -F '=' '{print $2}')
 	echo -e "${lightpurple}Old MIUI version: $OLD_VERSION${nc}"
-	NEW_VERSION=$(grep "ro.build.version.incremental" $OLD_SUPERR_DIR/system/build.prop | awk -F '=' '{print $2}')
+	NEW_VERSION=$(grep "ro.build.version.incremental" $OLD_DUMP_DIR/system/build.prop | awk -F '=' '{print $2}')
 	echo -e "${lightpurple}New MIUI version: $NEW_VERSION${nc}"
 else
 	# Fetch OLD_VERSION & NEW_VERSION by grepping build date
-	grepdate ${OLD_SUPERR_DIR}_old/system/build.prop
+	grepdate ${OLD_DUMP_DIR}_old/system/build.prop
 	OLD_VERSION=$(date +%Y%m%d -d @$UTCDATE)
 	echo -e "${lightpurple}Old version date: $OLD_VERSION${nc}"
-	grepdate ${OLD_SUPERR_DIR}/system/build.prop
+	grepdate ${OLD_DUMP_DIR}/system/build.prop
 	NEW_VERSION=$(date +%Y%m%d -d @$UTCDATE)
 	echo -e "${lightpurple}New version date: $NEW_VERSION${nc}"
 fi
@@ -155,7 +131,7 @@ elif [[ -z $NEW_VERSION ]]; then
 fi
 
 # Know the diff store path
-TARGET=$(grep "ro.build.description" $OLD_SUPERR_DIR/system/build.prop | awk -F '=|-' '{print $2}')
+TARGET=$(grep "ro.build.description" $OLD_DUMP_DIR/system/build.prop | awk -F '=|-' '{print $2}')
 DIFFDIR=$C_OTHERSTUFFDIR/romdiff/$TARGET
 
 # Create dir if not present
@@ -165,22 +141,22 @@ if [[ ! -e $DIFFDIR ]]; then
 fi
 
 # Copy old all_files.txt
-cp ${OLD_SUPERR_DIR}_old/00_project_files/all_files.txt $DIFFDIR/all_files-${OLD_VERSION}.txt
+cp ${OLD_DUMP_DIR}_old/00_project_files/all_files.txt $DIFFDIR/all_files-${OLD_VERSION}.txt
 
 # Create system.diff
-echo -e "${lightblue}Comparing two systems.\nOLD: ${OLD_SUPERR_DIR}_old/system\nNEW: $OLD_SUPERR_DIR/system${nc}"
-diff -bur ${OLD_SUPERR_DIR}_old/system $OLD_SUPERR_DIR/system > $DIFFDIR/system_${OLD_VERSION}-${NEW_VERSION}.diff
+echo -e "${lightblue}Comparing two systems.\nOLD: ${OLD_DUMP_DIR}_old/system\nNEW: $OLD_DUMP_DIR/system${nc}"
+diff -bur ${OLD_DUMP_DIR}_old/system $OLD_DUMP_DIR/system > $DIFFDIR/system_${OLD_VERSION}-${NEW_VERSION}.diff
 echo -e "${lightgreen}Completed, diff stored at $DIFFDIR/system_${OLD_VERSION}-${NEW_VERSION}.diff\n${nc}"
 
 # Create boot.diff
-echo -e "${lightblue}Comparing two boot.\nOLD: ${OLD_SUPERR_DIR}_old/bootimg\nNEW: $OLD_SUPERR_DIR/bootimg${nc}"
-sudo diff -bur ${OLD_SUPERR_DIR}_old/bootimg $OLD_SUPERR_DIR/bootimg > $DIFFDIR/boot_${OLD_VERSION}-${NEW_VERSION}.diff
+echo -e "${lightblue}Comparing two boot.\nOLD: ${OLD_DUMP_DIR}_old/bootimg\nNEW: $OLD_DUMP_DIR/bootimg${nc}"
+sudo diff -bur ${OLD_DUMP_DIR}_old/bootimg $OLD_DUMP_DIR/bootimg > $DIFFDIR/boot_${OLD_VERSION}-${NEW_VERSION}.diff
 echo -e "${lightgreen}Completed, diff stored at $DIFFDIR/boot_${OLD_VERSION}-${NEW_VERSION}.diff\n${nc}"
 
-echo -e "${yellow}Do you want to delete old superr dump? Y/N${nc}"
+echo -e "${yellow}Do you want to delete old dump? Y/N${nc}"
 read choice
 if [[ $choice = "y" || $choice = "Y" ]]; then
-	sudo rm -rf ${OLD_SUPERR_DIR}_old
+	sudo rm -rf ${OLD_DUMP_DIR}_old
 else
 	exit 1
 fi
