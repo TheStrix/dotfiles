@@ -71,39 +71,11 @@ NEW_ROM_FILE=$2
 cd $C_ANDROIDWORKDIR/dumps
 mv $OLD_DUMP_DIR ${OLD_DUMP_DIR}_old
 
-# Make a new superr dir with the new ROM file in it
+# Make a new dir with the new ROM file in it
 mkdir $OLD_DUMP_DIR
 
-if [[ $NEW_ROM_FILE == *.zip ]]; then
-	echo -e "${lightgreen}ZIP: $NEW_ROM_FILE${nc}"
-	echo -e "${lightgreen}Moving zip file to $OLD_DUMP_DIR${nc}"
-	mv $NEW_ROM_FILE $OLD_DUMP_DIR
-elif [[ $NEW_ROM_FILE == *.tgz ]]; then
-	echo -e "${lightgreen}TGZ: $NEW_ROM_FILE${nc}"
-	mkdir -p $HOME/.reallytemp
-	echo -e "${lightcyan}Extracting tgz firmware file${nc}"
-	tar -xzvf $NEW_ROM_FILE -C $HOME/.reallytemp
-	echo -e "${lightcyan}Copying system.img to $OLD_DUMP_DIR${nc}"
-	cp $HOME/.reallytemp/*/images/system.img $OLD_DUMP_DIR
-	echo -e "${lightcyan}Copying boot.img to $OLD_DUMP_DIR${nc}"
-	cp $HOME/.reallytemp/*/images/boot.img $OLD_DUMP_DIR
-	rm -rf $HOME/.reallytemp
-	echo -e "${lightgreen}Moving tgz file to $OLD_DUMP_DIR${nc}"
-	mv $NEW_ROM_FILE $OLD_DUMP_DIR
-else
-	echo -e "${lightred}Only zip/tgz are supported${nc}"
-	exit 1
-fi
-
 # Unpack new ROM
-unpackrom 
-
-echo -e "${yellow}Deleting system.img from $OLD_DUMP_DIR as it's extracted${nc}"
-rm $OLD_DUMP_DIR/system.img
-
-echo -e "${lightgreen}Unpacking boot.img to 'bootimg'${nc}"
-bootaik $OLD_DUMP_DIR/boot.img $OLD_DUMP_DIR/bootimg
-sudo chown -R $USER:$USER $OLD_DUMP_DIR/bootimg
+unpackrom $NEW_ROM_FILE $OLD_DUMP_DIR
 
 if [[ -n $(grep "miui" $OLD_DUMP_DIR/system/build.prop) ]]; then
 	# Store MIUI versions to append if diff file names
@@ -141,22 +113,27 @@ if [[ ! -e $DIFFDIR ]]; then
 fi
 
 # Copy old all_files.txt
-cp ${OLD_DUMP_DIR}_old/00_project_files/all_files.txt $DIFFDIR/all_files-${OLD_VERSION}.txt
+cp ${OLD_DUMP_DIR}_old/all_files.txt $DIFFDIR/all_files-${OLD_VERSION}.txt
 
-# Create system.diff
+# Create systemvendor.diff
 echo -e "${lightblue}Comparing two systems.\nOLD: ${OLD_DUMP_DIR}_old/system\nNEW: $OLD_DUMP_DIR/system${nc}"
-diff -bur ${OLD_DUMP_DIR}_old/system $OLD_DUMP_DIR/system > $DIFFDIR/system_${OLD_VERSION}-${NEW_VERSION}.diff
-echo -e "${lightgreen}Completed, diff stored at $DIFFDIR/system_${OLD_VERSION}-${NEW_VERSION}.diff\n${nc}"
+diff -bur ${OLD_DUMP_DIR}_old/system $OLD_DUMP_DIR/system > $DIFFDIR/systemvendor_${OLD_VERSION}-${NEW_VERSION}.diff
+# Because I use my own unpack script, I make a "vendor -> ../vendor" symlink in my extracted system dir, so no need to do this...
+#if [[ -d ${OLD_DUMP_DIR}/vendor || -d ${OLD_DUMP_DIR}_old/vendor ]]; then
+#	echo -e "${lightblue}Comparing two vendor.\nOLD: ${OLD_DUMP_DIR}_old/vendor\nNEW: $OLD_DUMP_DIR/vendor${nc}"
+#	diff -bur ${OLD_DUMP_DIR}_old/vendor $OLD_DUMP_DIR/vendor >> $DIFFDIR/systemvendor_${OLD_VERSION}-${NEW_VERSION}.diff
+#fi
+echo -e "${lightgreen}Completed, diff stored at $DIFFDIR/systemvendor_${OLD_VERSION}-${NEW_VERSION}.diff\n${nc}"
 
 # Create boot.diff
 echo -e "${lightblue}Comparing two boot.\nOLD: ${OLD_DUMP_DIR}_old/bootimg\nNEW: $OLD_DUMP_DIR/bootimg${nc}"
-sudo diff -bur ${OLD_DUMP_DIR}_old/bootimg $OLD_DUMP_DIR/bootimg > $DIFFDIR/boot_${OLD_VERSION}-${NEW_VERSION}.diff
+diff -bur ${OLD_DUMP_DIR}_old/bootimg $OLD_DUMP_DIR/bootimg > $DIFFDIR/boot_${OLD_VERSION}-${NEW_VERSION}.diff
 echo -e "${lightgreen}Completed, diff stored at $DIFFDIR/boot_${OLD_VERSION}-${NEW_VERSION}.diff\n${nc}"
 
 echo -e "${yellow}Do you want to delete old dump? Y/N${nc}"
 read choice
 if [[ $choice = "y" || $choice = "Y" ]]; then
-	sudo rm -rf ${OLD_DUMP_DIR}_old
+	rm -rf ${OLD_DUMP_DIR}_old
 else
 	exit 1
 fi
