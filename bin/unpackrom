@@ -50,10 +50,10 @@ ROM_PATH="${1}"
 OUTPUT_DIR="${2}"
 ROM_FILE=$(basename $ROM_PATH)
 UNZIP_DIR="$OUTPUT_DIR/$(echo "$ROM_FILE" | sed -e 's/\.[^.]*$//')"
+mkdir -p $UNZIP_DIR
 
 # Unzip ROM file
 if [[ $ROM_FILE = *.zip ]]; then
-	mkdir -p $UNZIP_DIR
 	if [[ $(unzip -l $ROM_PATH | grep payload.bin) ]]; then
 		echo -e "${yellow}\nA/B ROM detected. Extracting payload.bin...${nc}"
 		cd $UNZIP_DIR
@@ -66,10 +66,9 @@ if [[ $ROM_FILE = *.zip ]]; then
 		unzip -q ${ROM_PATH} -d ${UNZIP_DIR}
 		cd $UNZIP_DIR
 		# System and vendor image
+		PARTITIONS="system"
 		if [[ $(ls | grep vendor.new.dat) ]]; then
-			PARTITIONS="system vendor"
-		else
-			PARTITIONS="system"
+			PARTITIONS+=" vendor"
 		fi
 		for p in $PARTITIONS; do
 			if [[ -f $p.new.dat.br ]]; then
@@ -83,19 +82,27 @@ if [[ $ROM_FILE = *.zip ]]; then
 		# Boot image
 		cp boot.img $OUTPUT_DIR
 	fi
-elif [[ $ROM_FILE = *.tar.gz  ]]; then
-	mkdir -p $UNZIP_DIR
-	echo -e "TAR WIP"
-	exit 1
+elif [[ $ROM_FILE = *.tgz  ]]; then
+	tar -xzf $ROM_PATH -C $UNZIP_DIR
+	cd $UNZIP_DIR/images
+	PARTITIONS="system boot modem"
+	if [[ -f vendor.img ]]; then
+		PARTITIONS+=" vendor"
+	fi
+	if [[ -f NON-HLOS.bin ]]; then
+		mv NON-HLOS.bin modem.img
+	fi
+	for p in $PARTITIONS; do
+		mv $p.img $OUTPUT_DIR
+	done
 else
 	echo -e "${lightred}\nError: Unknown file format: $ROM_PATH\nOnly zip & tar.gz are supported.\n${nc}"
 fi
 
 cd $OUTPUT_DIR
+PARTITIONS="system"
 if [[ $(ls | grep vendor.img) ]]; then
-	PARTITIONS="system vendor"
-else
-	PARTITIONS="system"
+	PARTITIONS+=" vendor"
 fi
 for p in $PARTITIONS; do
 	mkdir "${p}"
@@ -140,6 +147,7 @@ if [[ -d vendor ]]; then
 	else
 		cd system
 		ln -sf ../vendor vendor
+		cd ../
 	fi
 fi
 
