@@ -49,11 +49,20 @@ fi
 ROM_PATH="${1}"
 OUTPUT_DIR="${2}"
 ROM_FILE=$(basename $ROM_PATH)
-UNZIP_DIR="$OUTPUT_DIR/$(echo "$ROM_FILE" | sed -e 's/\.[^.]*$//')"
-mkdir -p $UNZIP_DIR
+FILE_WITHOUT_EXT="$(echo "$ROM_FILE" | sed -e 's/\.[^.]*$//')"
+UNZIP_DIR="$OUTPUT_DIR/${FILE_WITHOUT_EXT}_extracted"
+
+if [[ -d $OUTPUT_DIR ]]; then
+	# Cleanup
+	rm -rf $OUTPUT_DIR/*
+else
+	# Create output dir
+	mkdir -p $OUTPUT_DIR
+fi
 
 # Unzip ROM file
 if [[ $ROM_FILE = *.zip ]]; then
+	mkdir -p $UNZIP_DIR
 	if [[ $(unzip -l $ROM_PATH | grep payload.bin) ]]; then
 		echo -e "${yellow}\nA/B ROM detected. Extracting payload.bin...${nc}"
 		cd $UNZIP_DIR
@@ -80,9 +89,12 @@ if [[ $ROM_FILE = *.zip ]]; then
 		# Modem image
 		cp firmware-update/modem.img $OUTPUT_DIR || cp firmware-update/NON-HLOS.bin $OUTPUT_DIR/modem.img
 		# Boot image
-		cp boot.img $OUTPUT_DIR
+		if [[ -f boot.img ]]; then
+			cp boot.img $OUTPUT_DIR
+		fi
 	fi
 elif [[ $ROM_FILE = *.tgz  ]]; then
+	mkdir -p $UNZIP_DIR
 	tar -xzf $ROM_PATH -C $UNZIP_DIR
 	cd $UNZIP_DIR/images
 	PARTITIONS="system boot modem"
@@ -95,6 +107,12 @@ elif [[ $ROM_FILE = *.tgz  ]]; then
 	for p in $PARTITIONS; do
 		mv $p.img $OUTPUT_DIR
 	done
+elif [[ $ROM_FILE = *.img ]]; then
+	if [[ ! -z $(file $ROM_PATH | grep sparse) ]]; then
+		echo -e "${yellow}\nConverting sparse image...${nc}"
+		$C_ANDROIDTOOLSDIR/simg2img/simg2img $ROM_PATH $OUTPUT_DIR/${FILE_WITHOUT_EXT}_unsparse.img
+		mv $OUTPUT_DIR/${FILE_WITHOUT_EXT}_unsparse.img $OUTPUT_DIR/$ROM_FILE
+	fi
 else
 	echo -e "${lightred}\nError: Unknown file format: $ROM_PATH\nOnly zip & tar.gz are supported.\n${nc}"
 fi
@@ -119,15 +137,19 @@ for p in $PARTITIONS; do
 done
 
 # Unpack modem
-mkdir modem
-sudo mount -t vfat -o loop modem.img modem/
-cp modem/verinfo/ver_info.txt $OUTPUT_DIR
-sudo umount modem
-rm modem.img
+if [[ -f modem.img ]]; then
+	mkdir modem
+	sudo mount -t vfat -o loop modem.img modem/
+	cp modem/verinfo/ver_info.txt $OUTPUT_DIR
+	sudo umount modem
+	rm modem.img
+fi
 
 # Unpack boot.img
-echo -e "${yellow}\nUnpacking boot.img...$p${nc}"
-bootaik boot.img
+if [[ -f boot.img ]]; then
+	echo -e "${yellow}\nUnpacking boot.img...${nc}"
+	bootaik boot.img
+fi
 
 # Create all_files.txt
 echo -e "${yellow}\nCreating all_files.txt...${nc}"
