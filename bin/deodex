@@ -63,6 +63,10 @@ fi
 if [[ -z "$CDEXCONVERTER" ]]; then
     if [[ -f $(find "$C_ANDROIDTOOLSDIR"/vdexExtractor -name compact_dex_converter) ]]; then
         export CDEXCONVERTER=$(find "$C_ANDROIDTOOLSDIR"/vdexExtractor -name compact_dex_converter)
+    elif [[ -f $C_PADIR/vendor/blobscript/"$HOST"/compact_dex_converter ]]; then
+        export CDEXCONVERTER="$C_PADIR"/vendor/blobscript/"$HOST"/compact_dex_converter
+    elif [[ -f $C_LINEAGEDIR/vendor/lineage/build/tools/"$HOST"/compact_dex_converter ]]; then
+        export CDEXCONVERTER="$C_LINEAGEDIR"/vendor/lineage/build/tools/"$HOST"/compact_dex_converter
     else
         echo -e "${lightred}compact_dex_converter not found!${nc}"
         echo -e "${lightred}Export \$CDEXCONVERTER path for compact_dex_converter bin to continue...${nc}"
