@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+
+. $HOME/.dotfiles/aliases
+
+usage() {
+	cat <<USAGE
+
+Usage:
+		bash $0 <blob_src_file> [OPTIONS]
+
+Examples: 	$0 blobs.txt -l
+		Checks if all the blobs specified in blobs.txt are present.
+
+OPTIONS:
+	-h, --help
+		Display this help message.
+
+	-f, --find
+		Checks if all the blobs specified in blobs.txt are present.
+
+	-r, --remove
+		Remove blobs, $\2 is path of proprietary vendor.
+
+	-c, --copy
+		Copy blobs.
+
+	-p, --push
+		Push blobs to device via adb
+
+USAGE
+}
+
+# Setup getopt.
+long_opts="help,find,remove:,copy:,push"
+getopt_cmd=$(getopt -o hfr:c:p --long "$long_opts" \
+            -n $(basename $0) -- "$@") || \
+            { echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
+
+eval set -- "$getopt_cmd"
+
+while true; do
+    case "$1" in
+        -h|--help) usage; exit 0;;
+        -f|--find) FIND="true";;
+		-r|--remove) REM_PATH="$2"; shift;;
+		-c|--copy) CPY_PATH="$2"; shift;;
+		-p|--push) PUSH="true";;
+        --) shift; break;;
+    esac
+    shift
+done
+
+# Mandatory argument
+if [ $# -eq 0 ]; then
+    echo -e "\nERROR: Missing mandatory argument: blob_src_file\n"
+    usage
+    exit 1
+fi
+if [ $# -gt 1 ]; then
+    echo -e "\nERROR: Extra inputs. Need blob_src_file only\n"
+    usage
+    exit 1
+fi
+
+blob_src_file="$1"; shift
+
+function files_push() {
+	lib=$1
+	if [[ ! -z $CPY_PATH ]]; then
+		PROP_DIR=$CPY_PATH/$(dirname $lib)
+		if [[ ! -d $PROP_DIR ]]; then
+			echo -e "${yellow}Creating dir: $PROP_DIR${nc}"
+			mkdir -p $PROP_DIR
+		fi
+		cp $lib $CPY_PATH/$lib
+	fi
+	if [[ ! -z $PUSH ]]; then
+		adb push $lib /system/$lib
+		adb shell chmod 644 /system/$lib
+	fi
+}
+
+function bin_push() {
+	bin=$1
+	if [[ ! -z $CPY_PATH ]]; then
+		PROP_DIR=$CPY_PATH/$(dirname $bin)
+		if [[ ! -d $PROP_DIR ]]; then
+			echo -e "${yellow}Creating dir: $PROP_DIR${nc}"
+			mkdir -p $PROP_DIR
+		fi
+		cp $bin $CPY_PATH/$bin
+	fi
+	if [[ ! -z $PUSH ]]; then
+		adb push $bin /system/$bin
+		adb shell chmod 755 /system/$bin
+	fi
+}
+
+if [[ ! -z $PUSH ]]; then
+	# adb remount as root
+	adbrem
+fi
+
+for f in $(cat $blob_src_file); do
+	file=$(basename "$f")
+	file_ext=$(echo "$file" | sed -e 's/.*\.//')
+	if [[ ! -z $FIND ]]; then
+		ls --color=auto $f
+	elif [[ ! -z $REM_PATH ]]; then
+		rm $REM_PATH/$f
+	elif [[ ! -z $(ls -F $f | grep '*$' ) ]]; then
+		bin_push $f
+	else
+		if [[ $file_ext = "jar" || $file_ext = "apk" ]]; then
+			deodex $f
+		fi
+		files_push $f
+	fi
+done
