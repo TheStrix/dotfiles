@@ -77,18 +77,25 @@ mkdir $OLD_DUMP_DIR
 # Unpack new ROM
 unpackrom $NEW_ROM_FILE $OLD_DUMP_DIR
 
-if [[ -n $(grep "miui" $OLD_DUMP_DIR/system/build.prop) ]]; then
+# Set the system path
+if [[ -d $OLD_DUMP_DIR/system/system && -d ${OLD_DUMP_DIR}_old/system/system ]]; then
+	SYSTEM_PATH="system/system"
+else
+	SYSTEM_PATH="system"
+fi
+
+if [[ -n $(grep "miui" $OLD_DUMP_DIR/$SYSTEM_PATH/build.prop) ]]; then
 	# Store MIUI versions to append if diff file names
-	OLD_VERSION=$(grep "ro.build.version.incremental" ${OLD_DUMP_DIR}_old/system/build.prop | awk -F '=' '{print $2}')
+	OLD_VERSION=$(grep "ro.build.version.incremental" ${OLD_DUMP_DIR}_old/$SYSTEM_PATH/build.prop | awk -F '=' '{print $2}')
 	echo -e "${lightpurple}Old MIUI version: $OLD_VERSION${nc}"
-	NEW_VERSION=$(grep "ro.build.version.incremental" $OLD_DUMP_DIR/system/build.prop | awk -F '=' '{print $2}')
+	NEW_VERSION=$(grep "ro.build.version.incremental" $OLD_DUMP_DIR/$SYSTEM_PATH/build.prop | awk -F '=' '{print $2}')
 	echo -e "${lightpurple}New MIUI version: $NEW_VERSION${nc}"
 else
 	# Fetch OLD_VERSION & NEW_VERSION by grepping build date
-	grepdate ${OLD_DUMP_DIR}_old/system/build.prop
+	grepdate ${OLD_DUMP_DIR}_old/$SYSTEM_PATH/build.prop
 	OLD_VERSION=$(date +%Y%m%d -d @$UTCDATE)
 	echo -e "${lightpurple}Old version date: $OLD_VERSION${nc}"
-	grepdate ${OLD_DUMP_DIR}/system/build.prop
+	grepdate ${OLD_DUMP_DIR}/$SYSTEM_PATH/build.prop
 	NEW_VERSION=$(date +%Y%m%d -d @$UTCDATE)
 	echo -e "${lightpurple}New version date: $NEW_VERSION${nc}"
 fi
@@ -103,7 +110,7 @@ elif [[ -z $NEW_VERSION ]]; then
 fi
 
 # Know the diff store path
-TARGET=$(grep "ro.build.description" $OLD_DUMP_DIR/system/build.prop | awk -F '=|-' '{print $2}')
+TARGET=$(grep "ro.build.description" $OLD_DUMP_DIR/$SYSTEM_PATH/build.prop | awk -F '=|-' '{print $2}')
 DIFFDIR=$C_OTHERSTUFFDIR/romdiff/$TARGET
 
 # Create dir if not present
@@ -116,8 +123,8 @@ fi
 cp ${OLD_DUMP_DIR}_old/all_files.txt $DIFFDIR/all_files-${OLD_VERSION}.txt
 
 # Create systemvendor.diff
-echo -e "${lightblue}Comparing two systems.\nOLD: ${OLD_DUMP_DIR}_old/system\nNEW: $OLD_DUMP_DIR/system${nc}"
-diff -bur ${OLD_DUMP_DIR}_old/system $OLD_DUMP_DIR/system > $DIFFDIR/systemvendor_${OLD_VERSION}-${NEW_VERSION}.diff
+echo -e "${lightblue}Comparing two systems.\nOLD: ${OLD_DUMP_DIR}_old/$SYSTEM_PATH\nNEW: $OLD_DUMP_DIR/$SYSTEM_PATH${nc}"
+diff -bur ${OLD_DUMP_DIR}_old/$SYSTEM_PATH $OLD_DUMP_DIR/$SYSTEM_PATH > $DIFFDIR/systemvendor_${OLD_VERSION}-${NEW_VERSION}.diff
 # Because I use my own unpack script, I make a "vendor -> ../vendor" symlink in my extracted system dir, so no need to do this...
 #if [[ -d ${OLD_DUMP_DIR}/vendor || -d ${OLD_DUMP_DIR}_old/vendor ]]; then
 #	echo -e "${lightblue}Comparing two vendor.\nOLD: ${OLD_DUMP_DIR}_old/vendor\nNEW: $OLD_DUMP_DIR/vendor${nc}"
