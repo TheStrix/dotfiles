@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+# Copyright (C) 2019 Parth Bhatia (TheStrix) <parthbhatia98@gmail.com>
+
+# source functions
+source ~/.dotfiles/functions
+
+usage() {
+	cat <<USAGE
+
+Usage:
+		bash $0 <FILE_OR_DIR_PATH_TO_UPLOAD>/<LINK_TO_DOWNLOAD> [OPTIONS]
+
+OPTIONS:
+	-h, --help
+		Display this help message
+
+	-d, --dir
+		Specify download dir
+
+	-p, --parent
+		Take logcat of events till that time and stop.
+USAGE
+}
+
+# Setup getopt.
+long_opts="help,dir:,parent:"
+getopt_cmd=$(getopt -o hd:p: --long "$long_opts" \
+			-n $(basename $0) -- "$@") || \
+			{ echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
+
+eval set -- "$getopt_cmd"
+
+while true; do
+	case "$1" in
+		-h|--help) usage; exit 0;;
+		-d|--dir) DIR=${2}; shift;;
+		-p|--parent) PARENT="$2"; shift;;
+		--) shift; break;;
+	esac
+	shift
+done
+
+# Mandatory argument
+if [ $# -eq 0 ]; then
+	echo -e "${red}\nERROR: Missing mandatory argument: FILE/URL/FILE ID\n${nc}"
+	usage
+	exit 1
+fi
+if [ $# -gt 1 ]; then
+	echo -e "${red}\nERROR: Extra inputs. Need FILE/URL/FILE ID only\n${nc}"
+	usage
+	exit 1
+fi
+
+P="$1"; shift
+
+# Function to upload to drive
+upload() {
+	local MD5
+	if [[ ! -z ${FILE} ]]; then
+		SIZE="$(du -h "${FILE}" | awk '{print $1}')"
+		if [[ -z ${PARENT} ]]; then
+			GDRIVE_UPLOAD_URL="$(gdrive upload --share "${FILE}" | awk '/https/ {print $7}')"
+		else
+			GDRIVE_UPLOAD_URL="$(gdrive upload --parent ${PARENT} --share "${FILE}" | awk '/https/ {print $7}')"
+		fi
+		GDRIVE_UPLOAD_ID="$(echo "${GDRIVE_UPLOAD_URL}" | sed -r -e 's/(.*)&export.*/\1/' -e 's/https.*id=(.*)/\1/' -e 's/https.*\/d\/(.*)\/view/\1/')"
+		UPLOAD_INFO="\nFile: ${lightcyan}$(basename "${FILE}")${nc}
+Size: ${lightcyan}${SIZE}${nc}
+GDrive ID: ${lightcyan}${GDRIVE_UPLOAD_ID}${nc}
+URL: ${lightcyan}${GDRIVE_UPLOAD_URL}${nc}
+"
+	elif [[ ! -z ${DIR} ]]; then
+		if [[ -z ${PARENT} ]]; then
+			gdrive upload -r "${DIR}"
+		else
+			gdrive upload --parent ${PARENT} -r "${DIR}"
+		fi
+		UPLOAD_INFO="Dir: ${lightcyan}$(basename "${DIR}")${nc}"
+	fi
+	echo -e "${UPLOAD_INFO}"
+}
+
+# Function to download from drive
+download() {
+	local URL GDRIVE IS_FOLDER FILE_ID
+	URL="${1}"
+	shift
+	GDRIVE="$(command -v gdrive)"
+	if [ -z "${GDRIVE}" ]; then
+		echo -e "${lightred}gdrive is not in \$PATH${nc}"
+		return 1
+	fi
+	# Detect folder by link
+	if [[ "${URL:?}" =~ folders ]]; then
+		FILE_ID="$(echo "${URL}" | sed -r -e 's/https.*folders\/(.*)/\1/' -e 's/(.*)\?usp=sharing/\1/')"
+		IS_FOLDER=true
+	else
+		FILE_ID="$(echo "${URL:?}" | sed -r -e 's/(.*)&export.*/\1/' -e 's/https.*id=(.*)/\1/' -e 's/https.*\/d\/(.*)\/view/\1/')"
+		# Detect folder if only file/folder ID is given
+		FILE_INFO=$(gdrive info ${FILE_ID})
+		if [[ $FILE_INFO =~ vnd.google-apps.folder ]]; then
+			IS_FOLDER=true
+		elif [[ $FILE_INFO =~ notFound ]]; then
+			# Handle the case where the input is a file/dir with a wrong name,
+			# it assumes it as a download link, so make a check if the file exists.
+			echo -e "${lightred} ${FILE_INFO}${nc}"
+			return
+		fi
+	fi
+	if [ ! -z "${IS_FOLDER}" ]; then
+		gdrive download -r --path ${DL_PATH} "${FILE_ID:?}"
+	else
+		CONFIRM=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate "https://docs.google.com/uc?export=download&id=$FILE_ID" -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')
+		aria2c -d ${DL_PATH} --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$CONFIRM&id=$FILE_ID"
+		rm -rf /tmp/cookies.txt
+	fi
+}
+
+# Set download path
+if [[ -z ${DIR} ]]; then
+	# Default to current dir
+	DL_PATH=${PWD}
+else
+	DL_PATH=${DIR}
+fi
+
+# Check if the passed arg is a file/dir or URL
+if [[ -f ${P} ]]; then
+	FILE=$(readlink -f ${P})
+	upload ${FILE}
+elif [[ -d ${P} ]]; then
+	DIR=$(readlink -f ${P})
+	upload ${DIR}
+else
+	LINK=${P}
+	download $LINK
+fi
