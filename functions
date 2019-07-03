@@ -136,6 +136,16 @@ function syncc() {
              --current-branch --no-tags "$@"
 }
 
+# For dumbasses like me
+function reboot() {
+    echo -n "Are you sure? You really meant to reboot the computer and not the connected adb device you dumbass? (Y/N): "
+    read REPLY
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        reboot
+    fi
+}
+
 # Download a file given the Google Drive URL
 function gdrivedl {
     local CONFIRM FILE_ID URL; URL="${1}"; shift
