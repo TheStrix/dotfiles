@@ -380,42 +380,42 @@ fi
 if [[ "$UPLOAD" = "true" ]]; then
   if [[ "$IMAGE" == "bootimg" ]]; then
     echo -e "${yellow}Uploading boot.img to drive${nc}"
-    gdrive upload --parent 1GAKzFhwEDC2LM-_iveXGMBUYoooQ1ud2 ${OUT}/boot.img
+    gdriveutil --parent 1GAKzFhwEDC2LM-_iveXGMBUYoooQ1ud2 ${OUT}/boot.img
   else
     if [[ "$CURDIR" = lineage* ]]; then
       echo -e "${yellow}Uploading ${TARGET} LineageOS to drive${nc}"
       if [[ "$TARGET" = "kenzo" ]]; then
-        gdrive upload --parent 0B9JxQ_RHblHkZWpaejlPNUtjVEk ${OUT}/lineage-*.zip
+        gdriveutil --parent 0B9JxQ_RHblHkZWpaejlPNUtjVEk ${OUT}/lineage-*.zip
       elif [[ "$TARGET" = "hydrogen" ]]; then
-        gdrive upload --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ${OUT}/lineage-*.zip
+        gdriveutil --parent 0B9JxQ_RHblHkU1IxaW1mTEVfMEE ${OUT}/lineage-*.zip
       elif [[ "$TARGET" = "sagit" ]]; then
-        gdrive upload --parent 0B9JxQ_RHblHkemswTVRkTERYdXM ${OUT}/lineage-*.zip
+        gdriveutil --parent 0B9JxQ_RHblHkemswTVRkTERYdXM ${OUT}/lineage-*.zip
       elif [[ "$TARGET" = "berkeley" ]]; then
-        gdrive upload --parent 1ZguqcdEaU5DeOCryvF61bIni_nRn_HJR ${OUT}/lineage-*.zip
+        gdriveutil --parent 1ZguqcdEaU5DeOCryvF61bIni_nRn_HJR ${OUT}/lineage-*.zip
       elif [[ "$TARGET" = "beryllium" ]]; then
-        gdrive upload --parent 1mXQPW9nLRgUHhd3A4bAGigi1NP_-0Oto ${OUT}/lineage-*.zip
+        gdriveutil --parent 1mXQPW9nLRgUHhd3A4bAGigi1NP_-0Oto ${OUT}/lineage-*.zip
       else
-        gdrive upload ${OUT}/lineage-*.zip
+        gdriveutil ${OUT}/lineage-*.zip
       fi
     elif [[ "$CURDIR" = pa* ]]; then
       if [[ "$TARGET" = "sagit" ]]; then
         echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
-        gdrive upload --parent 0B9JxQ_RHblHkZHV1aFpxNUhzOUU ${OUT}/pa_*.zip
+        gdriveutil --parent 0B9JxQ_RHblHkZHV1aFpxNUhzOUU ${OUT}/pa_*.zip
       elif [[ "$TARGET" = "beryllium" ]]; then
         echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
-        gdrive upload --parent 16zTCs5qj9pBaqYUdzCgu6uRVuTkP3hFd ${OUT}/pa_*.zip
+        gdriveutil --parent 16zTCs5qj9pBaqYUdzCgu6uRVuTkP3hFd ${OUT}/pa_*.zip
       else
         echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
-        gdrive upload ${OUT}/pa_*.zip
+        gdriveutil ${OUT}/pa_*.zip
       fi
     elif [[ "$CURDIR" = aosp* ]]; then
       if [[ "$TARGET" = "hikey960" ]] || [[ "$TARGET" = "hikey960_tv" ]]; then
         upldir=$(gdrive mkdir --parent 1uOl8zXlX8xNm1cFaoVxGcoISo-aN4erx "images_$(date -u +%Y%m%d-%H:%M)" | awk '{print $2}')
         echo -e "${yellow}Uploading compiled images to dir images_$(date -u +%Y%m%d-%H:%M): $upldir${nc}"
-        gdrive upload --parent $upldir ${OUT}/system.img
-        gdrive upload --parent $upldir ${OUT}/vendor.img
-        gdrive upload --parent $upldir ${OUT}/userdata.img
-        gdrive upload --parent $upldir ${OUT}/boot.img
+        gdriveutil --parent $upldir ${OUT}/system.img
+        gdriveutil --parent $upldir ${OUT}/vendor.img
+        gdriveutil --parent $upldir ${OUT}/userdata.img
+        gdriveutil --parent $upldir ${OUT}/boot.img
       fi
     else
       echo -e "${yellow}Upload configured only for AOSP, LineageOS & PA${nc}"
