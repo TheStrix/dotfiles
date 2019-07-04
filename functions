@@ -137,11 +137,12 @@ function syncc() {
 }
 
 # For dumbasses like me
+reboot_bin=$(command -v reboot)
 function reboot() {
     echo -n "Are you sure? You really meant to reboot the computer and not the connected adb device you dumbass? (Y/N): "
     read REPLY
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
-        reboot
+        $reboot_bin
     fi
 }
