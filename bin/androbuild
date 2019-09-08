@@ -322,6 +322,7 @@ elif [[ "$CURDIR" = aicp* ]]; then
 lunch aicp_$TARGET-$VARIANT
 elif [[ "$CURDIR" = pa* ]]; then
 lunch pa_$TARGET-$VARIANT
+export PA_VERSION_APPEND_TIME_OF_DAY=true
 else
 lunch $TARGET-$VARIANT
 fi
@@ -400,13 +401,16 @@ if [[ "$UPLOAD" = "true" ]]; then
     elif [[ "$CURDIR" = pa* ]]; then
       if [[ "$TARGET" = "sagit" ]]; then
         echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
-        gdriveutil --parent 0B9JxQ_RHblHkZHV1aFpxNUhzOUU ${OUT}/pa_*.zip
+        gdriveutil --parent 0B9JxQ_RHblHkZHV1aFpxNUhzOUU ${OUT}/pa*.zip
       elif [[ "$TARGET" = "beryllium" ]]; then
         echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
-        gdriveutil --parent 16zTCs5qj9pBaqYUdzCgu6uRVuTkP3hFd ${OUT}/pa_*.zip
+        gdriveutil --parent 16zTCs5qj9pBaqYUdzCgu6uRVuTkP3hFd ${OUT}/pa*.zip
+      elif [[ "$TARGET" = "oneplus6t" ]]; then
+        echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
+        gdriveutil --parent 1Z75th8o5qqnsF-uoAmyjJCxrnSZh_Pee ${OUT}/pa*.zip
       else
         echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
-        gdriveutil ${OUT}/pa_*.zip
+        gdriveutil ${OUT}/pa*.zip
       fi
     elif [[ "$CURDIR" = aosp* ]]; then
       if [[ "$TARGET" = "hikey960" ]] || [[ "$TARGET" = "hikey960_tv" ]]; then
