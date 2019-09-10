@@ -201,6 +201,7 @@ update_api() {
 
 setup_ccache() {
   export CCACHE_DIR=${CCACHEDIR}
+  export CCACHE_EXEC=$(which ccache)
   export USE_CCACHE=1
 }
 
