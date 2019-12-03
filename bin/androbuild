@@ -409,6 +409,9 @@ if [[ "$UPLOAD" = "true" ]]; then
       elif [[ "$TARGET" = "oneplus6t" ]]; then
         echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
         gdriveutil --parent 1Z75th8o5qqnsF-uoAmyjJCxrnSZh_Pee ${OUT}/pa*.zip
+      elif [[ "$TARGET" = "oneplus6" ]]; then
+      	echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
+      	gdriveutil --parent 1FxVIo1tRRYrAYo_e63142qEXncz0vK_X ${OUT}/pa*.zip
       else
         echo -e "${yellow}Uploading ${TARGET} AOSPA to drive${nc}"
         gdriveutil ${OUT}/pa*.zip
