@@ -218,7 +218,7 @@ create_ccache() {
 
 # Set defaults
 VARIANT="userdebug"
-if [[ $HOSTNAME = "build3.de.xda-developers.com" ]]; then
+if [[ $(hostname) = "build3.de.xda-developers.com" ]]; then
   CCACHE="false"
 else
   CCACHE="true"
