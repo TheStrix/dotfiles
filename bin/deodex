@@ -35,12 +35,12 @@ fi
 
 # Check for binaries
 if [[ -z $BAKSMALIJAR || -z $SMALIJAR ]]; then
-    if [[ -f $C_PADIR/vendor/blobscript/smali/baksmali.jar && -f $C_PADIR/vendor/blobscript/smali/smali.jar ]]; then
-        export BAKSMALIJAR=$C_PADIR/vendor/blobscript/smali/baksmali.jar
-        export SMALIJAR=$C_PADIR/vendor/blobscript/smali/smali.jar
-    elif [[ -f $C_LINEAGEDIR/vendor/lineage/build/tools/smali/baksmali.jar && -f $C_LINEAGEDIR/vendor/lineage/build/tools/smali/smali.jar ]]; then
-        export BAKSMALIJAR=$C_LINEAGEDIR/vendor/lineage/build/tools/smali/baksmali.jar
-        export SMALIJAR=$C_LINEAGEDIR/vendor/lineage/build/tools/smali/smali.jar
+    if [[ -f $C_PADIR/prebuilts/tools-pa/common/smali/baksmali.jar && -f $C_PADIR/prebuilts/tools-pa/common/smali/smali.jar ]]; then
+        export BAKSMALIJAR=$C_PADIR/prebuilts/tools-pa/common/smali/baksmali.jar
+        export SMALIJAR=$C_PADIR/prebuilts/tools-pa/common/smali/smali.jar
+    elif [[ -f $C_LINEAGEDIR/prebuilts/tools-lineage/common/smali/baksmali.jar && -f $C_LINEAGEDIR/prebuilts/tools-lineage/common/smali/smali.jar ]]; then
+        export BAKSMALIJAR=$C_LINEAGEDIR/prebuilts/tools-lineage/common/smali/baksmali.jar
+        export SMALIJAR=$C_LINEAGEDIR/prebuilts/tools-lineage/common/smali/smali.jar
     else
         echo -e "${lightred}baksmali.jar &/ smali.jar not found!${nc}"
         echo -e "${lightred}Export \$BAKSMALIJAR & \$SMALIJAR paths for baksmali.jar & smali.jar to continue...${nc}"

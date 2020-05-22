@@ -101,7 +101,18 @@ if [[ ! -z $PUSH ]]; then
 	adbrem
 fi
 
-for f in $(cat $blob_src_file); do
+while read f || [ -n "$f" ]; do
+	if [[ "$f" = "" ]]; then
+		echo -e ""
+		continue
+	fi
+	if [[ "$f" =~ ^# ]]; then
+		echo -e "${lightblue}$f${nc}"
+		continue
+	fi
+	if [[ "$f" =~ ^- ]]; then
+		f=${f:1}
+	fi
 	file=$(basename "$f")
 	file_ext=$(echo "$file" | sed -e 's/.*\.//')
 	if [[ ! -z $FIND ]]; then
@@ -116,4 +127,4 @@ for f in $(cat $blob_src_file); do
 		fi
 		files_push $f
 	fi
-done
+done < $blob_src_file

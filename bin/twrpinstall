@@ -15,9 +15,8 @@
 # limitations under the License.
 #
 
-# COLORS
-yellow='\e[1;33m'
-nc='\e[0m'
+# source functions
+source ~/.dotfiles/functions
 
 usage() {
     cat <<USAGE
@@ -47,12 +46,21 @@ OPTIONS:
     --save
         Copy zip to /sdcard/FlashZips
 
+    -a, --is-ab
+    	Is A/B device?
+
+    -r, --recovery
+    	Recovery image.
+
+    -k, --key
+    	Decryption key.
+
 USAGE
 }
 
 # Setup getopt.
-long_opts="help,wipedata,wipecache,wipedalvik,wipesystem,save"
-getopt_cmd=$(getopt -o hdcls --long "$long_opts" \
+long_opts="help,wipedata,wipecache,wipedalvik,wipesystem,save,is-ab,recovery:,key:"
+getopt_cmd=$(getopt -o hdclsar:k: --long "$long_opts" \
             -n $(basename $0) -- "$@") || \
             { echo -e "${yellow}\nERROR: Getopt failed. Extra args\n${nc}"; usage; exit 1;}
 
@@ -66,6 +74,9 @@ while true; do
         -l|--wipedalvik) WIPEDALVIK="true";;
         -s|--wipesystem) WIPESYSTEM="true";;
         --save) SAVE="true";;
+		-a|--is-ab) IS_AB="true";;
+		-r|--recovery) RECOVERY=${2}; shift;;
+		-k|--key) KEY="${2}"; shift;;
         --) shift; break;;
     esac
     shift
@@ -73,18 +84,56 @@ done
 
 # Mandatory argument
 if [ $# -eq 0 ]; then
-    echo -e "${red}\nERROR: Missing mandatory argument: ZIP_NAME\n${nc}"
+    echo -e "${lightred}\nERROR: Missing mandatory argument: ZIP_NAME\n${nc}"
     usage
     exit 1
 fi
 
-if [[ $(adb devices | tail -2 | head -1 | cut -f 2 | sed 's/ *$//g') != "recovery" ]]; then
-    adb reboot recovery
+if [[ $(adb devices) == "List of devices attached" ]]; then
+	echo -e "${lightred}No device connected... Exiting.${nc}"
+	exit 1
 fi
 
-while [[ $(adb devices | tail -2 | head -1 | cut -f 2 | sed 's/ *$//g') != "recovery" ]]; do
-    sleep 2
-done
+# Function to boot into recovery
+boot_recovery() {
+	echo -e "${yellow}Booting into recovery...${nc}"
+	if [[ "$IS_AB" == "true" ]]; then
+		adb reboot bootloader
+		if [[ -z $RECOVERY ]]; then
+			echo -e "${lightred}\nERROR: Missing mandatory argument: RECOVERY\n${nc}"
+	    	exit 1
+		fi
+		echo -e "${yellow}Booting img: $(basename $RECOVERY) (via fastboot boot)${nc}"
+		fastboot boot $RECOVERY
+	else
+	    adb reboot recovery
+	fi
+}
+
+if [[ $(adb devices | tail -2 | head -1 | cut -f 2 | sed 's/ *$//g') != "recovery" ]]; then
+	boot_recovery
+fi
+
+ADBMODE=$(adb devices | tail -2 | head -1 | cut -f 2 | sed 's/ *$//g')
+
+# Decrypt
+decrypt() {
+	if [[ $(adb wait-for-recovery shell getprop ro.crypto.state) == "encrypted" ]]; then
+		echo -e "${yellow}Decrypting...${nc}"
+		if [[ ! -z $KEY ]]; then
+			adb wait-for-recovery shell twrp decrypt $KEY;
+			adb wait-for-recovery shell twrp remountrw 1;
+		else
+			echo -e "${yellow}Waiting (endlessly) for user enter pin/pattern/password to decrypt...${nc}"
+			#while [[ $(adb shell getprop twrp.mount_to_decrypt) != "1" ]]; do
+	    		#sleep 2
+			#done
+		fi
+	fi
+}
+
+decrypt
+adb wait-for-recovery;
 
 if [[ "$WIPEDATA" == "true" ]]; then
     adb shell twrp wipe data;
@@ -108,6 +157,14 @@ if [[ -z $(adb shell ls /sdcard | grep FlashZips) ]]; then
 fi
 
 for l in $@; do
+	if [[ ! -z $IS_AB ]]; then
+		if [[ $(basename $l) = *gapps* ]]; then
+			echo -e "${yellow}Rebooting to recovery for flashing gapps to correct partition...${nc}"
+			boot_recovery
+			decrypt
+			adb wait-for-recovery
+		fi
+	fi
     if [[ "$SAVE" == "true" ]]; then
         adb push $l /sdcard/FlashZips/
     fi
@@ -121,6 +178,7 @@ for l in $@; do
         # Flash the zip from device storage if found in /sdcard/FlashZips
         ZIP_PATH=/sdcard/FlashZips/$(basename $l)
     fi
+    echo -e "${yellow}Flashing zip: $(basename $l)${nc}"
     adb shell twrp install $ZIP_PATH
 done
 

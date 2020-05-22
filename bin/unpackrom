@@ -67,7 +67,7 @@ if [[ $ROM_FILE = *.zip ]]; then
 		echo -e "${yellow}\nA/B ROM detected. Extracting payload.bin...${nc}"
 		cd $UNZIP_DIR
 		python2 $C_ANDROIDTOOLSDIR/extract_android_ota_payload/extract_android_ota_payload.py $ROM_PATH
-		for p in system vendor modem boot; do
+		for p in system vendor modem boot product opproduct; do
 			mv $p.img $OUTPUT_DIR
 		done
 	else
@@ -122,11 +122,17 @@ PARTITIONS="system"
 if [[ $(ls | grep vendor.img) ]]; then
 	PARTITIONS+=" vendor"
 fi
+if [[ $(ls | grep product.img) ]]; then
+	PARTITIONS+=" product"
+fi
+if [[ $(ls | grep opproduct.img) ]]; then
+	PARTITIONS+=" opproduct"
+fi
 for p in $PARTITIONS; do
 	mkdir "${p}"
 	mkdir "${p}_mount"
 	echo -e "${yellow}\nMounting $p.img to ${p}_mount${nc}"
-	sudo mount -t ext4 -o loop $p.img ${p}_mount
+	7z x "$p".img -y -o"$p"/ || sudo mount -t ext4 -o loop $p.img ${p}_mount
 	sudo chown $(whoami) ${p}_mount/ -R
 	echo -e "${yellow}\nCopying ${p}_mount/* content to $p${nc}"
 	cp -rf ${p}_mount/* ${p}/
@@ -154,6 +160,8 @@ fi
 # Create all_files.txt
 echo -e "${yellow}\nCreating all_files.txt...${nc}"
 find system/ -type f -exec echo {} >> allfiles.txt \;
+find product/ -type f -exec echo {} >> allfiles.txt \;
+find opproduct/ -type f -exec echo {} >> allfiles.txt \;
 find vendor/ -type f -exec echo {} >> allfiles.txt \;
 find bootimg/ -type f -exec echo {} >> allfiles.txt \;
 find modem/ -type f -exec echo {} >> allfiles.txt \;
